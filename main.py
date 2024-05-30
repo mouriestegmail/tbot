@@ -17,8 +17,8 @@ logging.getLogger("httpx").setLevel(logging.CRITICAL)
 logger = logging.getLogger(__name__)
 
 reply_keyboard = [
-    ["LOG"
-     , "SHOT"]
+     ["LOG", "FULL_LOG"],
+     ["SHOT"]
 ]
 
 users = [124768943, 799070257]
@@ -33,12 +33,8 @@ async def make_log(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def make_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     screenshot = pyautogui.screenshot()
-
-    # Сохраняем скриншот в файл
     screenshot.save('screenshot.png')
-
     photo_path = "screenshot.png"
-    # Отправка изображения
     with open(photo_path, 'rb') as photo:
         await context.bot.send_photo(chat_id=update.effective_chat.id, photo=photo)
 
@@ -77,7 +73,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
     if flag_alarm:
-        context.job_queue.run_repeating(alarm, 10, chat_id=chat_id, name=str(chat_id))
+        context.job_queue.run_repeating(alarm, 1, chat_id=chat_id, name=str(chat_id))
         flag_alarm = False
 
 
