@@ -6,7 +6,7 @@ import io
 from telegram import InputFile
 import os
 
-prison_dir = "/home/dev/tmp/"
+prison_dir = r"C:\Users\templocaladmin\PycharmProjects\mine_bot\png"
 set_folders = []
 flag_alarm = True
 
@@ -32,13 +32,16 @@ async def make_log(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 async def make_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print("shot")
     screenshot = pyautogui.screenshot()
-    screenshot.save('screenshot.png')
-    photo_path = "screenshot.png"
-    with open(photo_path, 'rb') as photo:
+    print("shot1")
+    fn = r'C:\Users\templocaladmin\PycharmProjects\tbot\tbot\screenshot.png'
+    screenshot.save(fn)
+    print("shot2")
+    with open(fn, 'rb') as photo:
         await context.bot.send_photo(chat_id=update.effective_chat.id, photo=photo)
 
-    with open(photo_path, 'rb') as photo_file:
+    with open(fn, 'rb') as photo_file:
         await context.bot.send_document(chat_id=update.effective_chat.id,
                                         document=photo_file,
                                         filename='photo.jpg')
