@@ -31,6 +31,9 @@ markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
 def read_config():
+    global prison_dir
+    global log_dir
+    global commands_dir
     sect = "general"
     config = configparser.ConfigParser()
     fn = "./config.ini"
@@ -50,6 +53,8 @@ def read_config():
     s_log_dir = "log_dir"
     s_prison_dir = "prison_dir"
     s_commands_dir = "commands_dir"
+
+    print(s_log_dir)
     for i in s_log_dir, s_prison_dir, s_commands_dir:
         if i not in config[sect]:
             print(f"check {fn} file: {i}")
@@ -158,6 +163,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 def main() -> None:
+    global prison_dir
     content = os.listdir(prison_dir)
     global set_folders
     set_folders = set([folder for folder in content if os.path.isdir(os.path.join(prison_dir, folder))])
