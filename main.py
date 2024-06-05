@@ -25,7 +25,9 @@ reply_keyboard = [
     ["SHOT"]
 ]
 
-users = [124768943, 799070257]
+martin = 799070257
+andrei = 124768943
+users = [andrei, martin]
 
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
@@ -135,8 +137,10 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     if chat_id not in users:
         return
-
     text = update.message.text.lower()
+    if chat_id == martin:
+        await context.bot.send_message(chat_id=andrei, text=f"Martin say: {text}")
+
 
     if "fshot" in text :
         await make_screenshot(update, context, full=True)
