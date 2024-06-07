@@ -99,7 +99,8 @@ async def make_log(update: Update, context: ContextTypes.DEFAULT_TYPE, count=15,
 
         with open(filename, 'r') as file:
             text = "".join(list(file.readlines()[-count:]))
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+        text = "```log\n" + text + "\n```"
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='Markdown')
     else:
         with open(filename, 'rb') as text_file:
             await context.bot.send_document(chat_id=update.effective_chat.id, document=text_file, filename='full.log')
