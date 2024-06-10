@@ -14,8 +14,8 @@ commands_dir = ""
 except_dir = ""
 a = 0
 
-set_folders_prison = []
-set_folders_except = []
+set_folders_prison = set()
+set_folders_except = set()
 flag_alarm = True
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.CRITICAL)
@@ -131,27 +131,28 @@ async def make_screenshot(chat_id, context: ContextTypes.DEFAULT_TYPE, full=Fals
 async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
     content_prison = os.listdir(prison_dir)
     content_except = os.listdir(except_dir)
+
+
     global set_folders_prison
     global set_folders_except
     new_set_folders_prison = set(
         [folder for folder in content_prison if os.path.isdir(os.path.join(prison_dir, folder))])
     new_set_folders_except = set(
-        [folder for folder in content_except if os.path.isdir(os.path.join(except_dir, folder))])
+        [folder for folder in content_except if os.path.isfile(os.path.join(except_dir, folder))])
+
 
     diff_prison = new_set_folders_prison - set_folders_prison
     diff_except = new_set_folders_except - set_folders_except
     set_folders_prison = new_set_folders_prison
     set_folders_except = new_set_folders_except
-
     if len(diff_prison) > 0:
         for user in users:
             await context.bot.send_message(user, text=str(diff_prison))
-
     for file in diff_except:
         fn = except_dir + '\\' + file
         with open(fn, 'rb') as file:
-            await context.bot.send_document(chat_id=andrei, document=file, filename='except.jpg')
             await make_log(chat_id=andrei, context=context, count=30)
+            await context.bot.send_document(chat_id=andrei, document=file, filename='except.jpg')
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -190,9 +191,14 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 def main() -> None:
     global prison_dir
+    global set_folders_except
+    global set_folders_prison
+
     content = os.listdir(prison_dir)
-    global set_folders
-    set_folders = set([folder for folder in content if os.path.isdir(os.path.join(prison_dir, folder))])
+    set_folders_prison = set([folder for folder in content if os.path.isdir(os.path.join(prison_dir, folder))])
+
+    content = os.listdir(except_dir)
+    set_folders_except = set([folder for folder in content if os.path.isfile(os.path.join(except_dir, folder))])
 
     application = Application.builder().token("7390205437:AAFKGhDIVlyGlkknUaIQx4L0vEp-ukm9eFM").build()
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
