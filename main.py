@@ -11,9 +11,11 @@ import pathlib
 log_dir = ""
 prison_dir = ""
 commands_dir = ""
+except_dir = ""
 a = 0
 
-set_folders = []
+set_folders_prison = []
+set_folders_except = []
 flag_alarm = True
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.CRITICAL)
@@ -36,6 +38,7 @@ def read_config():
     global prison_dir
     global log_dir
     global commands_dir
+    global except_dir
     sect = "general"
     config = configparser.ConfigParser()
     fn = "./config.ini"
@@ -55,9 +58,10 @@ def read_config():
     s_log_dir = "log_dir"
     s_prison_dir = "prison_dir"
     s_commands_dir = "commands_dir"
+    s_except_dir = "except_dir"
 
     print(s_log_dir)
-    for i in s_log_dir, s_prison_dir, s_commands_dir:
+    for i in s_log_dir, s_prison_dir, s_commands_dir, s_except_dir:
         if i not in config[sect]:
             print(f"check {fn} file: {i}")
             exit(-1)
@@ -65,16 +69,17 @@ def read_config():
     log_dir = config[sect][s_log_dir]
     prison_dir = config[sect][s_prison_dir]
     commands_dir = config[sect][s_commands_dir]
+    except_dir = config[sect][s_except_dir]
 
-    print(log_dir, prison_dir, commands_dir, sep="\n")
+    print(log_dir, prison_dir, commands_dir, except_dir, sep="\n")
 
 
-async def create_command(update: Update, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
+async def create_command(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
     l = text.split(" ")
     print(l)
     if len(l) != 2 or "comm" not in l[0]:
 
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="bad command")
+        await context.bot.send_message(chat_id=chat_id, text="bad command")
         return
     fn = commands_dir + f'\\{l[1]}'
 
@@ -84,12 +89,12 @@ async def create_command(update: Update, context: ContextTypes.DEFAULT_TYPE, tex
     if not file.exists():
         f = open(fn, 'tw', encoding='utf-8')
         f.close()
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"create command [{l[1]}]")
+        await context.bot.send_message(chat_id=chat_id, text=f"create command [{l[1]}]")
     else:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"command already exist")
+        await context.bot.send_message(chat_id=chat_id, text=f"command already exist")
 
 
-async def make_log(update: Update, context: ContextTypes.DEFAULT_TYPE, count=15, full=False) -> None:
+async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=False) -> None:
     global log_dir
     current_time = datetime.now()
     filename = log_dir + f'\\log_{current_time.strftime("%d.%m.%Y")}.log'
@@ -104,35 +109,49 @@ async def make_log(update: Update, context: ContextTypes.DEFAULT_TYPE, count=15,
         with open(filename, 'r') as file:
             text = "".join(list(file.readlines()[-count:]))
         text = "```log\n" + text + "\n```"
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='Markdown')
+        await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
     else:
         with open(filename, 'rb') as text_file:
-            await context.bot.send_document(chat_id=update.effective_chat.id, document=text_file, filename='full.log')
+            await context.bot.send_document(chat_id=chat_id, document=text_file, filename='full.log')
 
 
-async def make_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE, full=False) -> None:
+async def make_screenshot(chat_id, context: ContextTypes.DEFAULT_TYPE, full=False) -> None:
     screenshot = pyautogui.screenshot()
     fn = r'C:\Users\templocaladmin\PycharmProjects\tbot\tbot\screenshot.png'
     screenshot.save(fn)
 
     if not full:
         with open(fn, 'rb') as photo:
-            await context.bot.send_photo(chat_id=update.effective_chat.id, photo=photo)
+            await context.bot.send_photo(chat_id=chat_id, photo=photo)
     else:
         with open(fn, 'rb') as file:
-            await context.bot.send_document(chat_id=update.effective_chat.id, document=file, filename='photo.jpg')
+            await context.bot.send_document(chat_id=chat_id, document=file, filename='photo.jpg')
 
 
 async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
-    content = os.listdir(prison_dir)
-    global set_folders
-    new_set_folders = set([folder for folder in content if os.path.isdir(os.path.join(prison_dir, folder))])
+    content_prison = os.listdir(prison_dir)
+    content_except = os.listdir(except_dir)
+    global set_folders_prison
+    global set_folders_except
+    new_set_folders_prison = set(
+        [folder for folder in content_prison if os.path.isdir(os.path.join(prison_dir, folder))])
+    new_set_folders_except = set(
+        [folder for folder in content_except if os.path.isdir(os.path.join(except_dir, folder))])
 
-    diff = new_set_folders - set_folders
-    set_folders = new_set_folders
-    if len(diff) > 0:
+    diff_prison = new_set_folders_prison - set_folders_prison
+    diff_except = new_set_folders_except - set_folders_except
+    set_folders_prison = new_set_folders_prison
+    set_folders_except = new_set_folders_except
+
+    if len(diff_prison) > 0:
         for user in users:
-            await context.bot.send_message(user, text=str(diff))
+            await context.bot.send_message(user, text=str(diff_prison))
+
+    for file in diff_except:
+        fn = except_dir + '\\' + file
+        with open(fn, 'rb') as file:
+            await context.bot.send_document(chat_id=andrei, document=file, filename='except.jpg')
+            await make_log(chat_id=andrei, context=context, count=30)
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -146,21 +165,21 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await context.bot.send_message(chat_id=andrei, text=f"Martin say: {text}")
 
     if "fshot" in text:
-        await make_screenshot(update, context, full=True)
+        await make_screenshot(chat_id, context, full=True)
     elif "shot" in text:
-        await make_screenshot(update, context)
+        await make_screenshot(chat_id, context)
     elif "fulllog" in text:
-        await make_log(update, context, full=True)
+        await make_log(chat_id, context, full=True)
     elif "log" in text:
         integer_value = 10
         try:
             integer_value = int(''.join(re.findall(r'\d+', text)))
         except ValueError:
             pass
-        await make_log(update, context, count=integer_value)
+        await make_log(chat_id, context, count=integer_value)
     elif "comm" in text:
         print(text)
-        await create_command(update, context, text)
+        await create_command(chat_id, context, text)
 
     # await update.message.reply_text("нажми на кнопку :)", reply_markup=markup, )
 
