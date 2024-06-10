@@ -68,13 +68,18 @@ def read_config():
 
     print(log_dir, prison_dir, commands_dir, sep="\n")
 
-async def create_command(update: Update, context: ContextTypes.DEFAULT_TYPE, text = "") -> None:
-    l = text.split("")
+
+async def create_command(update: Update, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
+    l = text.split(" ")
     print(l)
-    if l != 2 or "comm" not in l[0]:
+    if len(l) != 2 or "comm" not in l[0]:
+
         await context.bot.send_message(chat_id=update.effective_chat.id, text="bad command")
         return
     fn = commands_dir + f'\\{l[1]}'
+
+    print(fn)
+
     file = pathlib.Path(fn)
     if not file.exists():
         f = open(fn, 'tw', encoding='utf-8')
@@ -84,16 +89,15 @@ async def create_command(update: Update, context: ContextTypes.DEFAULT_TYPE, tex
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"command already exist")
 
 
-
-async def make_log(update: Update, context: ContextTypes.DEFAULT_TYPE, count=15, full = False) -> None:
+async def make_log(update: Update, context: ContextTypes.DEFAULT_TYPE, count=15, full=False) -> None:
     global log_dir
     current_time = datetime.now()
-    filename = log_dir + f'\\log_{current_time.strftime(" %d.%m.%Y")}.log'
+    filename = log_dir + f'\\log_{current_time.strftime("%d.%m.%Y")}.log'
     print(filename)
 
     if not full:
         current_time = datetime.now()
-        filename = log_dir + f'\\log_{current_time.strftime(" %d.%m.%Y")}.log'
+        filename = log_dir + f'\\log_{current_time.strftime("%d.%m.%Y")}.log'
         print(filename)
         text = ""
 
@@ -105,7 +109,7 @@ async def make_log(update: Update, context: ContextTypes.DEFAULT_TYPE, count=15,
         with open(filename, 'rb') as text_file:
             await context.bot.send_document(chat_id=update.effective_chat.id, document=text_file, filename='full.log')
 
-                                                                                                                                          
+
 async def make_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE, full=False) -> None:
     screenshot = pyautogui.screenshot()
     fn = r'C:\Users\templocaladmin\PycharmProjects\tbot\tbot\screenshot.png'
@@ -131,7 +135,6 @@ async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
             await context.bot.send_message(user, text=str(diff))
 
 
-
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_message.chat_id
     global flag_alarm
@@ -142,8 +145,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if chat_id == martin:
         await context.bot.send_message(chat_id=andrei, text=f"Martin say: {text}")
 
-
-    if "fshot" in text :
+    if "fshot" in text:
         await make_screenshot(update, context, full=True)
     elif "shot" in text:
         await make_screenshot(update, context)
@@ -157,8 +159,8 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             pass
         await make_log(update, context, count=integer_value)
     elif "comm" in text:
-        await  create_command(update, context, text)
-
+        print(text)
+        await create_command(update, context, text)
 
     # await update.message.reply_text("нажми на кнопку :)", reply_markup=markup, )
 
