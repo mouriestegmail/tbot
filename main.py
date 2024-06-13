@@ -98,17 +98,19 @@ async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
     global log_dir
     current_time = datetime.now()
     filename = log_dir + f'\\log_{current_time.strftime("%d.%m.%Y")}.log'
+    money = log_dir + '\\money.txt'
     print(filename)
 
     if not full:
-        current_time = datetime.now()
-        filename = log_dir + f'\\log_{current_time.strftime("%d.%m.%Y")}.log'
-        print(filename)
-        text = ""
 
         with open(filename, 'r') as file:
             text = "".join(list(file.readlines()[-count:]))
+        with open(money, 'r') as file:
+            text += "\n" + "".join(list(file.readlines()[-1:]))
+
         text = "```log\n" + text + "\n```"
+
+
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
     else:
         with open(filename, 'rb') as text_file:
