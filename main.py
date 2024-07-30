@@ -93,13 +93,60 @@ async def create_command(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -
     else:
         await context.bot.send_message(chat_id=chat_id, text=f"command already exist")
 
+async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=False) -> None:
+    global log_dir
+    from datetime import datetime, timedelta
+    
+    print("make_history")
+    
+    today = datetime.now()  # Текущая дата и время
+    for i in range(14):
+        text = ""
+        ss=0
+        current_time = today - timedelta(days=i)
+        text = current_time.strftime('%d-%m-%Y')
+
+        all_a = eval("{'agt':0,'med':0,'pob':0,'ser':0}")
+
+        for i in range (1,7):
+            try:
+                filename = log_dir + f'\\{current_time.strftime("%d.%m.%Y")}_W{i}.sold'
+
+                print(filename)
+                with open(filename, 'r') as file:
+                    first_line = file.readline().strip()
+                    apples = eval(first_line)    
+                    apples = dict(sorted(apples.items()))
+                    s = 0
+                    for k,v in apples.items():
+                        s += v
+                        all_a[k] += v
+                    ss += s
+                    if first_line:
+                        text += "\n" + str(apples).replace(" ", "") + f' {s}'
+            except Exception as e:
+                text += "\n err"
+        text += f"\n\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:"        
+        text = text.replace('agt', 'a')
+        text = text.replace('med', 'm')
+        text = text.replace('pob', 'p')
+        text = text.replace('ser', 's')    
+        text = text.replace("'", "")
+        text = "```log\n" + text + "\n```"
+        print(text)
+        await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+
+
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=False) -> None:
     global log_dir
     current_time = datetime.now()
     text = ""
     print("make_sum")
     ss = 0
-    for i in range (1,5):
+
+    all_a = eval("{'agt':0,'med':0,'pob':0,'ser':0}")
+
+    for i in range (1,7):
         try:
             filename = log_dir + f'\\{current_time.strftime("%d.%m.%Y")}_W{i}.sold'
             print(filename)
@@ -110,19 +157,25 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                 s = 0
                 for k,v in apples.items():
                     s += v
+                    all_a[k] += v
                 ss += s
                 if first_line:
                     text += "\n" + str(apples).replace(" ", "") + f' {s}'
         except Exception as e:
             text += "\n err"
+    text += f"\n\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:"        
 
+    #text += f"\n {ss} \n\nAH:"
 
-    text += f"\n {ss} \nAH:\n"
+    f_list = []
+    for i in range(1,7):
+        f_list.append(log_dir + f'\\W{i}.ah')
 
-    for i in range (1,5):
+    s_f = log_dir + f'\\storage.ah'
+    f_list.append(s_f)
+
+    for filename in f_list:
         try:
-            filename = log_dir + f'\\W{i}.ah'
-            print(filename)
             with open(filename, 'r') as file:
                 first_line = file.readline().strip()
                 apples = eval(first_line)    
@@ -132,15 +185,24 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     s += v
                 ss += s
                 if first_line:
-                    text += "\n" + str(apples).replace(" ", "") + f' {s}'
+                    p = ""
+                    if filename == s_f:
+                        p = "s: "
+                    text += "\n"+ p + str(apples).replace(" ", "") + f' {s}'
         except Exception as e:
             text += "\n err"    
-
-    print(text)
+    text += "\n"
     filename = log_dir + f'\\money.txt'
     print(filename)
     with open(filename, 'r') as file:
         text += "".join(list(file.readlines()))
+
+    text = text.replace('agt', 'a')
+    text = text.replace('med', 'm')
+    text = text.replace('pob', 'p')
+    text = text.replace('ser', 's')    
+    text = text.replace("'", "")
+
     text = "```log\n" + text + "\n```"
     print(text)
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
@@ -234,8 +296,10 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         print(text)
         await create_command(chat_id, context, text)
     elif "sum" in text:
-        print(text)
+        await make_log(chat_id, context, count=10)
         await make_sum(chat_id, context, text)
+    elif "history" in text:
+        await make_history(chat_id, context, text)
     # await update.message.reply_text("нажми на кнопку :)", reply_markup=markup, )
 
     if flag_alarm:
@@ -254,7 +318,7 @@ def main() -> None:
     content = os.listdir(except_dir)
     set_folders_except = set([folder for folder in content if os.path.isfile(os.path.join(except_dir, folder))])
 
-    application = Application.builder().token("7390205437:AAFKGhDIVlyGlkknUaIQx4L0vEp-ukm9eFM").build()
+    application = Application.builder().token("7289006524:AAHDoVdPTae2ntvGmxy_5tkkgT4yjID1zaQ").build()
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
