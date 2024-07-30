@@ -73,6 +73,34 @@ def read_config():
 
     print(log_dir, prison_dir, commands_dir, except_dir, sep="\n")
 
+import re
+
+def format_text(text):
+    text = text.replace('agt', 'a')
+    text = text.replace('med', 'm')
+    text = text.replace('pob', 'p')
+    text = text.replace('ser', 's')
+    text = text.replace("'", "")
+    text = "```log\n" + text + "\n```"
+
+    lines = [line for line in text.strip().split('\n') if line]
+
+    formatted_lines = []
+    for line in lines:
+        if '{' in line and '}' in line:
+            line = re.sub(r'\s+', ' ', line.strip())
+            match = re.match(r"(\{.*\})\s+(\d+)", line)
+            if match:
+                dictionary_part = match.group(1)
+                number_part = match.group(2)
+                pairs = re.findall(r'(\w:)(\d+)', dictionary_part)
+                formatted_pairs = ', '.join(f"{key}{int(value):3}" for key, value in pairs)
+                formatted_dict_part = f"{{{formatted_pairs}}}"
+                formatted_lines.append(f"{formatted_dict_part} {number_part}")
+        else:
+            formatted_lines.append(line)
+
+    return '\n'.join(formatted_lines)
 
 async def create_command(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
     l = text.split(" ")
@@ -127,13 +155,8 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, fu
             except Exception as e:
                 text += "\n err"
         text += f"\n\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:"        
-        text = text.replace('agt', 'a')
-        text = text.replace('med', 'm')
-        text = text.replace('pob', 'p')
-        text = text.replace('ser', 's')    
-        text = text.replace("'", "")
-        text = "```log\n" + text + "\n```"
-        print(text)
+
+        text = format_text(text)
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 
@@ -187,8 +210,8 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                 if first_line:
                     p = ""
                     if filename == s_f:
-                        p = "s: "
-                    text += "\n"+ p + str(apples).replace(" ", "") + f' {s}'
+                        p = "\n "
+                    text += "\n" + p + str(apples).replace(" ", "") + f' {s}'
         except Exception as e:
             text += "\n err"    
     text += "\n"
@@ -197,14 +220,8 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
     with open(filename, 'r') as file:
         text += "".join(list(file.readlines()))
 
-    text = text.replace('agt', 'a')
-    text = text.replace('med', 'm')
-    text = text.replace('pob', 'p')
-    text = text.replace('ser', 's')    
-    text = text.replace("'", "")
+    text = format_text(text)
 
-    text = "```log\n" + text + "\n```"
-    print(text)
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 
