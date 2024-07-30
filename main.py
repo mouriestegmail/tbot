@@ -185,7 +185,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     text += "\n" + str(apples).replace(" ", "") + f' {s}'
         except Exception as e:
             text += "\n err"
-    text += (f"\n_______summ_________"
+    text += (f"\nsumm:"
              f"\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:")
 
     #text += f"\n {ss} \n\nAH:"
@@ -210,7 +210,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                 if first_line:
                     p = ""
                     if filename == s_f:
-                        p = "_______storage_______"
+                        p = "storage:"
                         print(p)
                     text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {s}'
         except Exception as e:
