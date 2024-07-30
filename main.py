@@ -140,7 +140,6 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, fu
             try:
                 filename = log_dir + f'\\{current_time.strftime("%d.%m.%Y")}_W{i}.sold'
 
-                print(filename)
                 with open(filename, 'r') as file:
                     first_line = file.readline().strip()
                     apples = eval(first_line)    
@@ -186,7 +185,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     text += "\n" + str(apples).replace(" ", "") + f' {s}'
         except Exception as e:
             text += "\n err"
-    text += (f"\n____________________"
+    text += (f"\n_______summ_________"
              f"\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:")
 
     #text += f"\n {ss} \n\nAH:"
@@ -211,13 +210,13 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                 if first_line:
                     p = ""
                     if filename == s_f:
-                        p = "\n____________________"
+                        p = "\n_______storage_______"
+                        print(p)
                     text += "\n" + p + str(apples).replace(" ", "") + f' {s}'
         except Exception as e:
             text += "\n err"    
     text += "\n"
     filename = log_dir + f'\\money.txt'
-    print(filename)
     with open(filename, 'r') as file:
         text += "".join(list(file.readlines()))
 
