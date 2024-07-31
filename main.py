@@ -81,7 +81,7 @@ def format_text(text):
     text = text.replace('pob', 'p')
     text = text.replace('ser', 's')
     text = text.replace("'", "")
-    text = "```log\n" + text + "\n```"
+    text = "```log\n" + text + "\n"
 
     lines = [line for line in text.strip().split('\n') if line]
 
@@ -104,10 +104,12 @@ def format_text(text):
 
 
 def format_ah_line(d:dict):
+    print(d)	
     z_value = d.pop('z', 0)
     total_sum = sum(d.values())
     formatted_pairs = ', '.join(f"{key}: {value:2}" for key, value in sorted(d.items()))
     formatted_dict = f"{{{formatted_pairs}}} {total_sum} [{z_value}]"
+    print(formatted_dict)
 
     return formatted_dict, total_sum
 
@@ -120,8 +122,6 @@ async def create_command(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -
         await context.bot.send_message(chat_id=chat_id, text="bad command")
         return
     fn = commands_dir + f'\\{l[1]}'
-
-    print(fn)
 
     file = pathlib.Path(fn)
     if not file.exists():
@@ -166,6 +166,7 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, fu
         text += f"\n\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:"
 
         text = format_text(text)
+        text += "'''"
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 
@@ -206,6 +207,8 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
 
     s_f = log_dir + f'\\storage.ah'
     f_list.append(s_f)
+    
+    text = format_text(text)
 
     for filename in f_list:
         try:
@@ -232,7 +235,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
     with open(filename, 'r') as file:
         text += "".join(list(file.readlines()))
 
-    text = format_text(text)
+    text += "'''"    
 
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
