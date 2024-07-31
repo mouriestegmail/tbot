@@ -201,18 +201,21 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
         try:
             with open(filename, 'r') as file:
                 first_line = file.readline().strip()
-                apples = eval(first_line)    
-                apples = dict(sorted(apples.items()))
-                s = 0
-                for k,v in apples.items():
-                    s += v
-                ss += s
-                if first_line:
-                    p = ""
-                    if filename == s_f:
-                        p = "storage:"
-                        print(p)
-                    text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {s}'
+                try:
+                    apples = eval(first_line)
+                    apples = dict(sorted(apples.items()))
+                    s = 0
+                    for k,v in apples.items():
+                        s += v
+                    ss += s
+                    if first_line:
+                        p = ""
+                        if filename == s_f:
+                            p = "storage:"
+                            print(p)
+                        text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {s}'
+                except Exception as e:
+                    text += "\n"+first_line
         except Exception as e:
             text += "\n err"    
     text += "\n"
