@@ -102,6 +102,16 @@ def format_text(text):
 
     return '\n'.join(formatted_lines)
 
+
+def format_ah_line(d:dict):
+    z_value = d.pop('z', 0)
+    total_sum = sum(d.values())
+    formatted_pairs = ', '.join(f"{key}: {value:2}" for key, value in sorted(d.items()))
+    formatted_dict = f"{{{formatted_pairs}}} {total_sum} [{z_value}]"
+
+    return formatted_dict, total_sum
+
+
 async def create_command(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
     l = text.split(" ")
     print(l)
@@ -204,16 +214,15 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                 try:
                     apples = eval(first_line)
                     apples = dict(sorted(apples.items()))
-                    s = 0
-                    for k,v in apples.items():
-                        s += v
+
+                    line, s = format_ah_line(apples)
                     ss += s
                     if first_line:
                         p = ""
                         if filename == s_f:
                             p = "storage:"
                             print(p)
-                        text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {s}'
+                        text += "\n" + p + "\n" + line
                 except Exception as e:
                     text += "\n"+first_line
         except Exception as e:
