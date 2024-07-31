@@ -94,7 +94,7 @@ def format_text(text):
                 dictionary_part = match.group(1)
                 number_part = match.group(2)
                 pairs = re.findall(r'(\w:)(\d+)', dictionary_part)
-                formatted_pairs = ', '.join(f"{key}{int(value):3}" for key, value in pairs)
+                formatted_pairs = ', '.join(f"{key}{int(value):2}" for key, value in pairs)
                 formatted_dict_part = f"{{{formatted_pairs}}}"
                 formatted_lines.append(f"{formatted_dict_part} {number_part}")
         else:
