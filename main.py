@@ -206,7 +206,8 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     apples = dict(sorted(apples.items()))
                     s = 0
                     for k,v in apples.items():
-                        s += v
+                        if k != 'z':
+                            s += v
                     ss += s
                     if first_line:
                         p = ""
