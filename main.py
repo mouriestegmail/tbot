@@ -7,6 +7,7 @@ import os
 from datetime import datetime
 import configparser
 import pathlib
+import format
 
 log_dir = ""
 prison_dir = ""
@@ -159,6 +160,7 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, fu
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 
+
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=False) -> None:
     global log_dir
     current_time = datetime.now()
@@ -189,7 +191,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
             text += "\n err"
     # text += (f"\nsumm:"
     #          f"\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:")
-    print(text)
+    # print(text)
     #text += f"\n {ss} \n\nAH:"
 
     f_list = []
@@ -224,7 +226,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
     filename = log_dir + f'\\money.txt'
     with open(filename, 'r') as file:
         text += "".join(list(file.readlines()))
-
+    text = "'''" + format.parse_to_table(text) + "'''"
     # text = format_text(text)
 
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
