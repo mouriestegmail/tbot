@@ -221,12 +221,12 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     text += "\n"+first_line
         except Exception as e:
             text += "\n err"
-    print(text)
+    text = "'''" + format.parse_to_table(text)
     text += "\n"
     filename = log_dir + f'\\money.txt'
     with open(filename, 'r') as file:
-        text += "".join(list(file.readlines()))
-    text = "'''" + format.parse_to_table(text) + "'''"
+        text += "".join(list(file.readlines())) + "'''"
+
     # text = format_text(text)
 
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')

@@ -1,75 +1,79 @@
 import re
-import ast
-from tabulate import tabulate
+from typing import List, Dict
+
 
 def parse_to_table(data: str) -> str:
-    # Парсинг данных
-    sold_data = []
-    ah_data = []
-    storage_data = []
+    def parse_data(text: str) -> Dict[str, List[Dict[str, int]]]:
+        sections = re.split(r'\n(?=[a-zA-Z]+:)', text.strip())
+        data = {}
+        for section in sections:
+            header, *rows = section.split('\n')
+            name = header.strip(':')
+            rows = [eval(row.strip()) for row in rows if row.strip()]
+            data[name] = rows
+        return data
 
-    # Разделение данных по секциям
-    sections = re.split(r'\nsold:|\nAH:|\nstorage:', data)
+    def create_table(data: List[Dict[str, int]], headers: List[str], include_z: bool = False) -> str:
+        # Заголовок и разделитель
+        header_row = "|" + "|".join(f"{h[:2]}".center(3) for h in headers) + "|sum|\n"
+        separator_row = "|" + "|".join(["-" * 3 for _ in headers]) + "|---|\n"
+        separator_row_full = "-" + "-".join(["-" * 3 for _ in headers]) + "-----\n"
 
-    # Парсинг секции sold
-    sold_lines = sections[1].strip().split('\n')
-    for line in sold_lines:
-        sold_data.append(ast.literal_eval(line.strip()))
+        data_rows = ""
+        totals = {header: 0 for header in headers}
+        sum_total = 0
 
-    # Парсинг секции AH
-    ah_lines = sections[2].strip().split('\n')
-    for line in ah_lines:
-        ah_data.append(ast.literal_eval(line.strip()))
-
-    # Парсинг секции storage
-    storage_lines = sections[3].strip().split('\n')
-    for line in storage_lines:
-        if line.startswith("{") and line.endswith("}"):
-            storage_data.append(ast.literal_eval(line.strip()))
-
-    # Парсинг последней строки с числом
-    final_value = re.search(r'\$(\d+)', data).group(0)
-
-    # Добавление столбца с суммой, игнорируя 'z'
-    def add_sum_column(data, ignore_columns=None):
-        if ignore_columns is None:
-            ignore_columns = []
         for row in data:
-            sum_value = sum(value for key, value in row.items() if key not in ignore_columns)
-            row['sum'] = sum_value
+            row_values = [str(row.get(h, 0)).rjust(2)[:2] for h in headers]
+            row_sum = sum(int(row.get(h, 0)) for h in headers if (h != 'z'))
+            sum_total += row_sum
+            data_row = "|" + "|".join(value.center(3) for value in row_values) + f"|{row_sum:>3}|\n"
+            data_rows += data_row
+            for header in headers:
+                if header != 'z' or include_z:
+                    totals[header] += row.get(header, 0)
 
-    # Применение функции
-    add_sum_column(sold_data)
-    add_sum_column(ah_data, ignore_columns=['z'])
-    add_sum_column(storage_data)
+        sum_row = "|" + "|".join(f"{str(totals[header]).rjust(3)[:3]}" for header in headers) + f"|{sum_total:>3}|\n"
 
-    # Форматирование и возврат данных в виде строки
-    def format_table(title, data):
-        if not data:
-            return f"{title}:"
-
-        headers = data[0].keys()
-        table = [headers] + [list(row.values()) for row in data]
 
         if len(data) > 1:
-            total = {header: 0 for header in headers}
-            for row in data:
-                for key in total.keys():
-                    if key != 'sum':
-                        total[key] += row.get(key, 0)
-            total['sum'] = sum(row['sum'] for row in data)
-            table.append(["-" * len(str(total[header])) for header in headers])
-            table.append(list(total.values()))
+            return separator_row_full + header_row + separator_row + data_rows + separator_row + sum_row + separator_row_full
+        else:
+            return separator_row_full + header_row + separator_row + data_rows + separator_row_full
 
-        return f"{title}:\n" + tabulate(table, headers='firstrow', tablefmt='grid')
+    # Парсинг входных данных
+    data_dict = parse_data(data)
 
-    # Формирование таблиц
-    result = []
-    result.append(format_table("sold", sold_data))
-    result.append(format_table("AH", ah_data))
-    result.append(format_table("storage", storage_data))
-    result.append(f"\n[{final_value}]")
+    # Генерация таблиц
+    sold_table = create_table(data_dict['sold'], ['agt', 'med', 'pob', 'ser'])
+    ah_table = create_table(data_dict['AH'], ['agt', 'med', 'pob', 'ser', 'z'], include_z=True)
+    storage_table = create_table(data_dict['storage'], ['agt', 'med', 'pob', 'ser'])
 
-    return "\n".join(result)
+    # Объединение таблиц в один текстовый блок
+    result = "Sold:\n" + sold_table + "\nAH:\n" + ah_table + "\nStorage:\n" + storage_table
+
+    return result
 
 
+# Пример использования функции
+data_text = """
+sold:
+{'agt': 20, 'med': 12, 'pob': 18, 'ser': 12}
+{'agt': 18, 'med': 7, 'pob': 17, 'ser': 5}
+{'agt': 13, 'med': 6, 'pob': 11, 'ser': 9}
+{'agt': 8, 'med': 0, 'pob': 8, 'ser': 7}
+{'agt': 16, 'med': 9, 'pob': 18, 'ser': 9}
+{'agt': 14, 'med': 15, 'pob': 16, 'ser': 12}
+AH:
+{'agt': 1, 'med': 3, 'pob': 2, 'ser': 1, 'z': 5}
+{'agt': 2, 'med': 2, 'pob': 3, 'ser': 1, 'z': 3}
+{'agt': 1, 'med': 2, 'pob': 2, 'ser': 2, 'z': 4}
+{'agt': 0, 'med': 1, 'pob': 3, 'ser': 0, 'z': 2}
+{'agt': 2, 'med': 1, 'pob': 1, 'ser': 2, 'z': 6}
+{'agt': 3, 'med': 3, 'pob': 1, 'ser': 1, 'z': 1}
+storage:
+{'agt': 1, 'med': 2, 'pob': 3, 'ser': 1}
+"""
+
+# Вывод результата
+print(parse_to_table(data_text))
