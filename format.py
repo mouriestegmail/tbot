@@ -15,8 +15,8 @@ def parse_to_table(data: str) -> str:
 
     def create_table(data: List[Dict[str, int]], headers: List[str], include_z: bool = False) -> str:
         # Заголовок и разделитель
-        header_row = "|" + "|".join(f"{h[:2]}".center(3) for h in headers) + "|sum|\n"
-        separator_row = "|" + "|".join(["-" * 3 for _ in headers]) + "|---|\n"
+        header_row = "|".join(f"{h[:1]}".center(3) for h in headers) + "|sum\n"
+        separator_row =  "|".join(["-" * 3 for _ in headers]) + "|---\n"
         separator_row_full = "-" + "-".join(["-" * 3 for _ in headers]) + "-----\n"
 
         data_rows = ""
@@ -24,22 +24,22 @@ def parse_to_table(data: str) -> str:
         sum_total = 0
 
         for row in data:
-            row_values = [str(row.get(h, 0)).rjust(2)[:2] for h in headers]
+            row_values = [str(row.get(h, 0)).rjust(3)[:3] for h in headers]
             row_sum = sum(int(row.get(h, 0)) for h in headers if (h != 'z'))
             sum_total += row_sum
-            data_row = "|" + "|".join(value.center(3) for value in row_values) + f"|{row_sum:>3}|\n"
+            data_row =  "|".join(value.center(3) for value in row_values) + f"|{row_sum:>3}\n"
             data_rows += data_row
             for header in headers:
                 if header != 'z' or include_z:
                     totals[header] += row.get(header, 0)
 
-        sum_row = "|" + "|".join(f"{str(totals[header]).rjust(3)[:3]}" for header in headers) + f"|{sum_total:>3}|\n"
+        sum_row = "|".join(f"{str(totals[header]).rjust(3)[:3]}" for header in headers) + f"|{sum_total:>3}\n"
 
 
         if len(data) > 1:
-            return separator_row_full + header_row + separator_row + data_rows + separator_row + sum_row + separator_row_full
+            return  header_row + separator_row + data_rows + separator_row + sum_row
         else:
-            return separator_row_full + header_row + separator_row + data_rows + separator_row_full
+            return header_row + separator_row + data_rows
 
     # Парсинг входных данных
     data_dict = parse_data(data)
