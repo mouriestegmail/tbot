@@ -200,6 +200,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
 
     s_f = log_dir + f'\\storage.ah'
     f_list.append(s_f)
+    text += "\nAH:"
 
     for filename in f_list:
         try:
@@ -212,7 +213,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     if first_line:
                         p = ""
                         if filename == s_f:
-                            p = "storage:"
+                            p = "\nstorage:"
                             print(p)
                         # text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {s}'
                         text += p + "\n" + str(apples)
@@ -221,15 +222,18 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     text += "\n"+first_line
         except Exception as e:
             text += "\n err"
-    text = "'''" + format.parse_to_table(text)
+
+    print(text)
+    text = "<code> \n" + format.parse_to_table(text)
     text += "\n"
     filename = log_dir + f'\\money.txt'
     with open(filename, 'r') as file:
-        text += "".join(list(file.readlines())) + "'''"
+        text += "".join(list(file.readlines()))
+    text += "</code>"
 
     # text = format_text(text)
 
-    await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+    await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='HTML')
 
 
 async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=False) -> None:
