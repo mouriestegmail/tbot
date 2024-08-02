@@ -181,16 +181,14 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     s += v
                     all_a[k] += v
                 ss += s
-                text += "\n" + str(apples)
-                # if first_line:
-                #     text += "\n" + str(apples).replace(" ", "") + f' {s}'
+                # text += "\n" + str(apples)
+                if first_line:
+                    text += "\n" + str(apples).replace(" ", "") + f' {s}'
         except Exception as e:
             print(e)
             text += "\n err"
-    # text += (f"\nsumm:"
-    #          f"\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:")
-    print(text)
-    #text += f"\n {ss} \n\nAH:"
+    text += (f"\nsumm:"
+             f"\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:")
 
     f_list = []
     for i in range(1,7):
@@ -198,7 +196,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
 
     s_f = log_dir + f'\\storage.ah'
     f_list.append(s_f)
-
+    ss = 0
     for filename in f_list:
         try:
             with open(filename, 'r') as file:
@@ -206,31 +204,37 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                 try:
                     apples = eval(first_line)
                     apples = dict(sorted(apples.items()))
-
+                    s = 0
                     if first_line:
                         p = ""
                         if filename == s_f:
                             p = "storage:"
                             print(p)
-                        # text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {s}'
-                        text += p + "\n" + str(apples)
+                        for k, v in apples.items():
+                            if k != 'z':
+                                s += v
+                                ss += v
+
+                        text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {s}'
+                        # text += p + "\n" + str(apples)
                 except Exception as e:
                     print(e)
                     text += "\n"+first_line
         except Exception as e:
             text += "\n err"
     print(text)
+    text += f"\n                {ss}"
     text += "\n"
     filename = log_dir + f'\\money.txt'
     with open(filename, 'r') as file:
         text += "".join(list(file.readlines()))
 
-    # text = format_text(text)
+    text = format_text(text)
 
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 
-async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=False) -> None:
+async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=30, full=False) -> None:
     global log_dir
     current_time = datetime.now()
     filename = log_dir + f'\\log_{current_time.strftime("%d.%m.%Y")}.log'
@@ -308,7 +312,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif "fulllog" in text:
         await make_log(chat_id, context, full=True)
     elif "log" in text:
-        integer_value = 10
+        integer_value = 30
         try:
             integer_value = int(''.join(re.findall(r'\d+', text)))
         except ValueError:
@@ -318,7 +322,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         print(text)
         await create_command(chat_id, context, text)
     elif "sum" in text:
-        await make_log(chat_id, context, count=10)
+        await make_log(chat_id, context, count=30)
         await make_sum(chat_id, context, text)
     elif "history" in text:
         await make_history(chat_id, context, text)
