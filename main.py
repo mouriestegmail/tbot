@@ -162,7 +162,7 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, fu
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=False) -> None:
     global log_dir
     current_time = datetime.now()
-    text = ""
+    text = "sold:\n"
     print("make_sum")
     ss = 0
 
@@ -181,13 +181,15 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     s += v
                     all_a[k] += v
                 ss += s
-                if first_line:
-                    text += "\n" + str(apples).replace(" ", "") + f' {s}'
+                text += "\n" + str(apples)
+                # if first_line:
+                #     text += "\n" + str(apples).replace(" ", "") + f' {s}'
         except Exception as e:
+            print(e)
             text += "\n err"
-    text += (f"\nsumm:"
-             f"\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:")
-
+    # text += (f"\nsumm:"
+    #          f"\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:")
+    print(text)
     #text += f"\n {ss} \n\nAH:"
 
     f_list = []
@@ -204,27 +206,26 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                 try:
                     apples = eval(first_line)
                     apples = dict(sorted(apples.items()))
-                    s = 0
-                    for k,v in apples.items():
-                        if k != 'z':
-                            s += v
-                    ss += s
+
                     if first_line:
                         p = ""
                         if filename == s_f:
                             p = "storage:"
                             print(p)
-                        text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {s}'
+                        # text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {s}'
+                        text += p + "\n" + str(apples)
                 except Exception as e:
+                    print(e)
                     text += "\n"+first_line
         except Exception as e:
-            text += "\n err"    
+            text += "\n err"
+    print(text)
     text += "\n"
     filename = log_dir + f'\\money.txt'
     with open(filename, 'r') as file:
         text += "".join(list(file.readlines()))
 
-    text = format_text(text)
+    # text = format_text(text)
 
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
