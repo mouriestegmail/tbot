@@ -208,7 +208,9 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     if first_line:
                         p = ""
                         if filename == s_f:
+                            text += f"\n                                {ss}"
                             p = "storage:"
+
                             print(p)
                         for k, v in apples.items():
                             if k != 'z':
@@ -223,7 +225,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
         except Exception as e:
             text += "\n err"
     print(text)
-    text += f"\n                {ss}"
+
     text += "\n"
     filename = log_dir + f'\\money.txt'
     with open(filename, 'r') as file:
