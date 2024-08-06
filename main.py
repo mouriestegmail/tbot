@@ -12,6 +12,7 @@ log_dir = ""
 prison_dir = ""
 commands_dir = ""
 except_dir = ""
+token = ""
 a = 0
 
 set_folders_prison = set()
@@ -39,6 +40,7 @@ def read_config():
     global log_dir
     global commands_dir
     global except_dir
+    global token
     sect = "general"
     config = configparser.ConfigParser()
     fn = "./config.ini"
@@ -59,9 +61,10 @@ def read_config():
     s_prison_dir = "prison_dir"
     s_commands_dir = "commands_dir"
     s_except_dir = "except_dir"
+    s_token = "token"
 
     print(s_log_dir)
-    for i in s_log_dir, s_prison_dir, s_commands_dir, s_except_dir:
+    for i in s_log_dir, s_prison_dir, s_commands_dir, s_except_dir, s_token:
         if i not in config[sect]:
             print(f"check {fn} file: {i}")
             exit(-1)
@@ -70,8 +73,9 @@ def read_config():
     prison_dir = config[sect][s_prison_dir]
     commands_dir = config[sect][s_commands_dir]
     except_dir = config[sect][s_except_dir]
+    token = config[sect][s_token]
 
-    print(log_dir, prison_dir, commands_dir, except_dir, sep="\n")
+    print(log_dir, prison_dir, commands_dir, except_dir, token, sep="\n")
 
 import re
 
@@ -153,7 +157,7 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, fu
                         text += "\n" + str(apples).replace(" ", "") + f' {s}'
             except Exception as e:
                 text += "\n err"
-        text += f"\n\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:"
+        text += f'\n\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:'
 
         text = format_text(text)
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
@@ -188,10 +192,10 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
             print(e)
             text += "\n err"
     text += (f"\nsumm:"
-             f"\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:")
+             f'\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:')
 
     f_list = []
-    for i in range(1,7):
+    for i in range(1, 7):
         f_list.append(log_dir + f'\\W{i}.ah')
 
     s_f = log_dir + f'\\storage.ah'
@@ -212,12 +216,15 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                             p = "storage:"
 
                             print(p)
+                        ah_max = "?"
                         for k, v in apples.items():
-                            if k != 'z':
+                            if k != 'z' and k != 'max':
                                 s += v
                                 ss += v
+                            if k == 'max':
+                                ah_max=str(v)
 
-                        text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {s}'
+                        text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {s}/{ah_max}'
                         # text += p + "\n" + str(apples)
                 except Exception as e:
                     print(e)
@@ -229,7 +236,14 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
     text += "\n"
     filename = log_dir + f'\\money.txt'
     with open(filename, 'r') as file:
-        text += "".join(list(file.readlines()))
+        modification_time = os.path.getmtime(filename)
+        modification_datetime = datetime.fromtimestamp(modification_time)
+        current_datetime = datetime.now()
+        time_difference = current_datetime - modification_datetime
+        minutes_passed = time_difference.total_seconds() / 60
+
+        text += "".join(list(file.readlines())) + "    " + str(minutes_passed) + "minutes passed"
+    text += "</code>"
 
     text = format_text(text)
 
@@ -339,6 +353,7 @@ def main() -> None:
     global prison_dir
     global set_folders_except
     global set_folders_prison
+    global token
 
     content = os.listdir(prison_dir)
     set_folders_prison = set([folder for folder in content if os.path.isdir(os.path.join(prison_dir, folder))])
@@ -346,7 +361,7 @@ def main() -> None:
     content = os.listdir(except_dir)
     set_folders_except = set([folder for folder in content if os.path.isfile(os.path.join(except_dir, folder))])
 
-    application = Application.builder().token("7289006524:AAHDoVdPTae2ntvGmxy_5tkkgT4yjID1zaQ").build()
+    application = Application.builder().token(token).build()
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
