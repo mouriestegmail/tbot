@@ -245,7 +245,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                                 s += v
                                 ss += v
                             print("1")
-                            sum_dict[k] += sum_dict.get(k, 0) + v
+                            sum_dict[k] = sum_dict.get(k, 0) + v
                             print(2)
 
                             print(f"sum: {k}  {sum_dict[k]}   {v}")
