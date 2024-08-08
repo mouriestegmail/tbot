@@ -222,7 +222,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                             if k != 'z' and k != 'max':
                                 s += v
                                 ss += v
-                                sum_dict[k] = sum_dict.get(k,0) + v
+                            sum_dict[k] += sum_dict.get(k,0) + v
                             if k == 'max':
                                 ah_max=str(v)
 
