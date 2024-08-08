@@ -107,6 +107,8 @@ def format_text(text):
                 l = f"{formatted_dict_part} {number_part}"
                 if flag or len(l) > 39:
                     l = l.replace(': ', ':')
+                if len(l) > 39:
+                    l = l.replace(', ', ',')
 
                 formatted_lines.append(l)
         else:
