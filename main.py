@@ -220,6 +220,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
     sum_dict = dict()
     for filename in f_list:
         try:
+            print(filename)
             with open(filename, 'r') as file:
                 first_line = file.readline().strip()
                 try:
