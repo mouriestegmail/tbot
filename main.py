@@ -105,8 +105,9 @@ def format_text(text):
                 formatted_pairs = ', '.join(f"{key}{int(value):2}" for key, value in pairs)
                 formatted_dict_part = f"{{{formatted_pairs}}}"
                 l = f"{formatted_dict_part} {number_part}"
-                if flag:
+                if flag or len(l) > 39:
                     l = l.replace(': ', ':')
+
                 formatted_lines.append(l)
         else:
             formatted_lines.append(line)
@@ -180,21 +181,17 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
     try:
         all_a = eval("{'agt':0, 'med':0, 'kil':0, 'pob':0,'ser':0}")
 
-        print(str(all_a))
     except Exception as e:
         print(e)
 
     for i in range (1,7):
         try:
             filename = log_dir + f'\\{current_time.strftime("%d.%m.%Y")}_W{i}.sold'
-            print(filename)
+
             with open(filename, 'r') as file:
                 first_line = file.readline().strip()
                 apples = eval(first_line)    
                 apples = dict(sorted(apples.items()))
-
-                print(f'{filename}')
-                print(str(apples))
 
                 s = 0
                 for k,v in apples.items():
@@ -218,10 +215,8 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
     f_list.append(s_f)
     ss = 0
     sum_dict = dict()
-    print(f_list)
     for filename in f_list:
         try:
-            print(filename)
             with open(filename, 'r') as file:
                 first_line = file.readline().strip()
                 try:
@@ -233,23 +228,14 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
 
                     s = 0
                     if first_line:
-                        print(s_f)
                         if filename == s_f:
                             text += "\n" + str(sum_dict).replace(" ", "") + f' {ss}' + "\nstorage:\n"
                         ah_max = "?"
-                        print(str(apples))
-                        print(apples.items())
                         for k, v in apples.items():
-                            print(f'for {k}  {v}')
                             if k != 'z' and k != 'max':
                                 s += v
                                 ss += v
-                            print("1")
                             sum_dict[k] = sum_dict.get(k, 0) + v
-                            print(2)
-
-                            print(f"sum: {k}  {sum_dict[k]}   {v}")
-                            print(str(sum_dict))
 
                             if k == 'max':
                                 ah_max=str(v)
