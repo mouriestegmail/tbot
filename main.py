@@ -105,8 +105,8 @@ def format_text(text):
                 formatted_pairs = ', '.join(f"{key}{int(value):2}" for key, value in pairs)
                 formatted_dict_part = f"{{{formatted_pairs}}}"
                 l = f"{formatted_dict_part} {number_part}"
-                # if flag:
-                #     l = l.replace(': ', ':')
+                if flag:
+                    l = l.replace(': ', ':')
                 formatted_lines.append(l)
         else:
             formatted_lines.append(line)
@@ -227,22 +227,23 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     apples = dict(sorted(apples.items()))
                     s = 0
                     if first_line:
-                        p = ""
+                        print(s_f)
                         if filename == s_f:
-                            text += "\n" + str(sum_dict).replace(" ", "") + f' {ss}'
-                            p = "storage:"
-
-                            print(p)
+                            text += "\n" + str(sum_dict).replace(" ", "") + f' {ss}' + "\nstorage:\n"
                         ah_max = "?"
                         for k, v in apples.items():
                             if k != 'z' and k != 'max':
                                 s += v
                                 ss += v
-                            sum_dict[k] += sum_dict.get(k,0) + v
+                            sum_dict[k] += sum_dict.get(k, 0) + v
+
+                            print(f"sum: {k}  {sum_dict[k]}   {v}")
+                            print(str(sum_dict))
+
                             if k == 'max':
                                 ah_max=str(v)
 
-                        text += "\n" + p + "\n" + str(apples).replace(" ", "").replace(": ",":") + f' {s}'
+                        text += "\n" + str(apples).replace(" ", "").replace(": ",":") + f' {s}'
                         # text += p + "\n" + str(apples)
                 except Exception as e:
                     print(e)
