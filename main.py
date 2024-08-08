@@ -213,7 +213,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     if first_line:
                         p = ""
                         if filename == s_f:
-                            text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {ss}'
+                            text += "\n" + str(sum_dict).replace(" ", "") + f' {ss}'
                             p = "storage:"
 
                             print(p)
