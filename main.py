@@ -228,8 +228,8 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     apples = eval(first_line)
                     apples = dict(sorted(apples.items()))
 
-                    print(first_line)
-                    print(str(apples))
+                    #print(first_line)
+
 
                     s = 0
                     if first_line:
@@ -237,6 +237,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                         if filename == s_f:
                             text += "\n" + str(sum_dict).replace(" ", "") + f' {ss}' + "\nstorage:\n"
                         ah_max = "?"
+                        print(str(apples))
                         for k, v in apples.items():
                             print(f'for {k}  {v}')
                             if k != 'z' and k != 'max':
