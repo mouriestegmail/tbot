@@ -1,0 +1,9 @@
+keyboard
+mouse
+numpy
+Pillow
+ping3
+pyperclip
+pytesseract
+Requests
+opencv-python

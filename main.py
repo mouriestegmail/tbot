@@ -84,13 +84,17 @@ def format_text(text):
     text = text.replace('med', 'm')
     text = text.replace('pob', 'p')
     text = text.replace('ser', 's')
+    text = text.replace('kil', 'k')
     text = text.replace("'", "")
     text = "```log\n" + text + "\n```"
 
     lines = [line for line in text.strip().split('\n') if line]
 
     formatted_lines = []
+    flag = False
     for line in lines:
+        if 'AH' in line:
+            flag = True
         if '{' in line and '}' in line:
             line = re.sub(r'\s+', ' ', line.strip())
             match = re.match(r"(\{.*\})\s+(\d+)", line)
@@ -100,7 +104,10 @@ def format_text(text):
                 pairs = re.findall(r'(\w:)(\d+)', dictionary_part)
                 formatted_pairs = ', '.join(f"{key}{int(value):2}" for key, value in pairs)
                 formatted_dict_part = f"{{{formatted_pairs}}}"
-                formatted_lines.append(f"{formatted_dict_part} {number_part}")
+                l = f"{formatted_dict_part} {number_part}"
+                if flag:
+                    l = l.replace(': ', ':')
+                formatted_lines.append(l)
         else:
             formatted_lines.append(line)
 
@@ -138,7 +145,7 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, fu
         current_time = today - timedelta(days=i)
         text = current_time.strftime('%d-%m-%Y')
 
-        all_a = eval("{'agt':0,'med':0,'pob':0,'ser':0}")
+        all_a = eval("{'agt':0, 'kil':0, 'med':0,'pob':0,'ser':0}")
 
         for i in range (1,7):
             try:
@@ -160,6 +167,7 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, fu
         text += f'\n\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:'
 
         text = format_text(text)
+
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 
@@ -169,8 +177,12 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
     text = "sold:\n"
     print("make_sum")
     ss = 0
+    try:
+        all_a = eval("{'agt':0, 'med':0, 'kil':0, 'pob':0,'ser':0}")
 
-    all_a = eval("{'agt':0,'med':0,'pob':0,'ser':0}")
+        print(str(all_a))
+    except Exception as e:
+        print(e)
 
     for i in range (1,7):
         try:
@@ -180,6 +192,10 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                 first_line = file.readline().strip()
                 apples = eval(first_line)    
                 apples = dict(sorted(apples.items()))
+
+                print(f'{filename}')
+                print(str(apples))
+
                 s = 0
                 for k,v in apples.items():
                     s += v
@@ -226,14 +242,13 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                             if k == 'max':
                                 ah_max=str(v)
 
-                        text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {s}/{ah_max}'
+                        text += "\n" + p + "\n" + str(apples).replace(" ", "").replace(": ",":") + f' {s}/{ah_max}'
                         # text += p + "\n" + str(apples)
                 except Exception as e:
                     print(e)
                     text += "\n"+first_line
         except Exception as e:
             text += "\n err"
-    print(text)
 
     text += "\n"
     filename = log_dir + f'\\money.txt'
@@ -242,13 +257,12 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
         modification_datetime = datetime.fromtimestamp(modification_time)
         current_datetime = datetime.now()
         time_difference = current_datetime - modification_datetime
-        minutes_passed = time_difference.total_seconds() / 60
+        minutes_passed = time_difference.total_seconds() // 6 /10
 
-        text += "".join(list(file.readlines())) + "    " + str(minutes_passed) + "minutes passed"
-    text += "</code>"
+        text += "".join(list(file.readlines())) + "    " + str(minutes_passed) + "m"
 
     text = format_text(text)
-
+    text = text.replace(" z:", "  ")
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 
