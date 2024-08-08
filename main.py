@@ -238,12 +238,15 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                             text += "\n" + str(sum_dict).replace(" ", "") + f' {ss}' + "\nstorage:\n"
                         ah_max = "?"
                         print(str(apples))
+                        print(apples.items())
                         for k, v in apples.items():
                             print(f'for {k}  {v}')
                             if k != 'z' and k != 'max':
                                 s += v
                                 ss += v
+                            print("1")
                             sum_dict[k] += sum_dict.get(k, 0) + v
+                            print(2)
 
                             print(f"sum: {k}  {sum_dict[k]}   {v}")
                             print(str(sum_dict))
