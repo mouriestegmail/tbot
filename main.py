@@ -242,7 +242,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                             if k == 'max':
                                 ah_max=str(v)
 
-                        text += "\n" + p + "\n" + str(apples).replace(" ", "").replace(": ",":") + f' {s}/{ah_max}'
+                        text += "\n" + p + "\n" + str(apples).replace(" ", "").replace(": ",":") + f' {s}'
                         # text += p + "\n" + str(apples)
                 except Exception as e:
                     print(e)
