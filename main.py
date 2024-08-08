@@ -218,6 +218,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
     f_list.append(s_f)
     ss = 0
     sum_dict = dict()
+    print(f_list)
     for filename in f_list:
         try:
             print(filename)
@@ -226,6 +227,10 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                 try:
                     apples = eval(first_line)
                     apples = dict(sorted(apples.items()))
+
+                    print(first_line)
+                    print(str(apples))
+
                     s = 0
                     if first_line:
                         print(s_f)
