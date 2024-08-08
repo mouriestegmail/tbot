@@ -105,9 +105,9 @@ def format_text(text):
                 formatted_pairs = ', '.join(f"{key}{int(value):2}" for key, value in pairs)
                 formatted_dict_part = f"{{{formatted_pairs}}}"
                 l = f"{formatted_dict_part} {number_part}"
-                if flag or len(l) > 39:
+                if flag or len(l) > 35:
                     l = l.replace(': ', ':')
-                if len(l) > 39:
+                if len(l) > 35:
                     l = l.replace(', ', ',')
 
                 formatted_lines.append(l)
