@@ -201,6 +201,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
     s_f = log_dir + f'\\storage.ah'
     f_list.append(s_f)
     ss = 0
+    sum_dict = dict()
     for filename in f_list:
         try:
             with open(filename, 'r') as file:
@@ -212,7 +213,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                     if first_line:
                         p = ""
                         if filename == s_f:
-                            text += f"\n                                {ss}"
+                            text += "\n" + p + "\n" + str(apples).replace(" ", "") + f' {ss}'
                             p = "storage:"
 
                             print(p)
@@ -221,6 +222,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                             if k != 'z' and k != 'max':
                                 s += v
                                 ss += v
+                                sum_dict[k] = sum_dict.get(k,0) + v
                             if k == 'max':
                                 ah_max=str(v)
 
