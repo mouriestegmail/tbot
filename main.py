@@ -292,21 +292,23 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     global log_dir
     current_time = datetime.now()
 
-    dir_ss = log_dir + "\\ss"
+    dir_ss = log_dir + "/ss"
 
     if not os.path.exists(dir_ss):
+        await context.bot.send_message(chat_id=chat_id, text=f'[{dir_ss}] not exist')
         return
 
-    dir_worker = dir_ss + "\\" + dir
+    dir_worker = dir_ss + "/" + dir.upper()
 
     if not os.path.exists(dir_worker):
+        await context.bot.send_message(chat_id=chat_id, text=f'[{dir_worker}] not exist')
         return
 
     files_list = [f for f in os.listdir(dir_worker) if os.path.isfile(os.path.join(dir_worker, f))]
 
     for fn in files_list:
         with open(fn, 'rb') as file:
-            await context.bot.send_document(chat_id=chat_id, document=file, filename='photo.jpg')
+            await context.bot.send_document(chat_id=chat_id, document=file, filename=file.name)
             await context.bot.send_photo(chat_id=chat_id, photo=file)
 
 
@@ -361,7 +363,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await context.bot.send_message(chat_id=andrei, text=f"Martin say: {text}")
 
     if "ss" in text:
-        await make_ss(chat_id, context)
+        await make_ss(chat_id, context, text=text)
 
     elif "fshot" in text:
         await make_screenshot(chat_id, context, full=True)
