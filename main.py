@@ -135,7 +135,8 @@ async def create_command(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -
     else:
         await context.bot.send_message(chat_id=chat_id, text=f"command already exist")
 
-async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=False) -> None:
+
+async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     global log_dir
     from datetime import datetime, timedelta
     
@@ -174,17 +175,13 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, fu
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 
-async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=False) -> None:
+async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     global log_dir
     current_time = datetime.now()
     text = "sold:\n"
     print("make_sum")
     ss = 0
-    try:
-        all_a = eval("{'agt':0, 'med':0, 'kil':0, 'pob':0,'ser':0}")
-
-    except Exception as e:
-        print(e)
+    all_a = eval("{'agt':0, 'med':0, 'kil':0, 'pob':0,'ser':0}")
 
     for i in range (1,7):
         try:
@@ -224,9 +221,6 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE, count=15, full=F
                 try:
                     apples = eval(first_line)
                     apples = dict(sorted(apples.items()))
-
-                    #print(first_line)
-
 
                     s = 0
                     if first_line:
@@ -286,9 +280,8 @@ async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=30, full=F
         with open(filename, 'rb') as text_file:
             await context.bot.send_document(chat_id=chat_id, document=text_file, filename='full.log')
 
+
 async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
-
-
     global log_dir
     current_time = datetime.now()
 
@@ -311,10 +304,19 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
         if os.path.isfile(full_path):
             files_list.append(full_path)
 
+    import asyncio
+
     for fn in files_list:
         with open(fn, 'rb') as file:
             await context.bot.send_document(chat_id=chat_id, document=file, filename=file.name)
+        await asyncio.sleep(0.5)
+
+    for fn in files_list:
+        with open(fn, 'rb') as file:
             await context.bot.send_photo(chat_id=chat_id, photo=file)
+        await asyncio.sleep(0.5)
+
+
 
 
 async def make_screenshot(chat_id, context: ContextTypes.DEFAULT_TYPE, full=False) -> None:
@@ -373,10 +375,10 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await make_screenshot(chat_id, context, full=True)
     elif "shot" in text:
         await make_screenshot(chat_id, context)
-    elif "fulllog" in text:
+    elif "fulllog" in text or "flog" in text:
         await make_log(chat_id, context, full=True)
     elif "log" in text:
-        integer_value = 30
+        integer_value = 5
         try:
             integer_value = int(''.join(re.findall(r'\d+', text)))
         except ValueError:
@@ -386,11 +388,10 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         print(text)
         await create_command(chat_id, context, text)
     elif "sum" in text:
-        await make_log(chat_id, context, count=30)
-        await make_sum(chat_id, context, text)
+        await make_log(chat_id, context, count=5)
+        await make_sum(chat_id, context)
     elif "history" in text:
-        await make_history(chat_id, context, text)
-    # await update.message.reply_text("нажми на кнопку :)", reply_markup=markup, )
+        await make_history(chat_id, context)
 
     if flag_alarm:
         context.job_queue.run_repeating(alarm, 1, chat_id=chat_id, name=str(chat_id))
