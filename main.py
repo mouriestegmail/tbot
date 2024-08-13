@@ -287,7 +287,7 @@ async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=30, full=F
             await context.bot.send_document(chat_id=chat_id, document=text_file, filename='full.log')
 
 async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
-    dir = text.replace("ss", "").replace(" ", "")
+
 
     global log_dir
     current_time = datetime.now()
@@ -298,13 +298,18 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
         await context.bot.send_message(chat_id=chat_id, text=f'[{dir_ss}] not exist')
         return
 
-    dir_worker = dir_ss + "/" + dir.upper()
+    folder = text.replace("ss", "").replace(" ", "")
+    dir_worker = dir_ss + "/" + folder.upper()
 
     if not os.path.exists(dir_worker):
         await context.bot.send_message(chat_id=chat_id, text=f'[{dir_worker}] not exist')
         return
 
-    files_list = [f for f in os.listdir(dir_worker) if os.path.isfile(os.path.join(dir_worker, f))]
+    files_list = []
+    for f in os.listdir(dir_worker):
+        full_path = os.path.join(dir_worker, f)
+        if os.path.isfile(full_path):
+            files_list.append(full_path)
 
     for fn in files_list:
         with open(fn, 'rb') as file:
@@ -336,7 +341,6 @@ async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
         [folder for folder in content_prison if os.path.isdir(os.path.join(prison_dir, folder))])
     new_set_folders_except = set(
         [folder for folder in content_except if os.path.isfile(os.path.join(except_dir, folder))])
-
 
     diff_prison = new_set_folders_prison - set_folders_prison
     diff_except = new_set_folders_except - set_folders_except
