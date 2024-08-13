@@ -311,13 +311,6 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
             await context.bot.send_document(chat_id=chat_id, document=file, filename=file.name)
         await asyncio.sleep(0.5)
 
-    for fn in files_list:
-        with open(fn, 'rb') as file:
-            await context.bot.send_photo(chat_id=chat_id, photo=file)
-        await asyncio.sleep(0.5)
-
-
-
 
 async def make_screenshot(chat_id, context: ContextTypes.DEFAULT_TYPE, full=False) -> None:
     screenshot = pyautogui.screenshot()
