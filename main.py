@@ -116,6 +116,7 @@ def format_text(text):
 
     return '\n'.join(formatted_lines)
 
+
 async def create_command(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
     l = text.split(" ")
     print(l)
