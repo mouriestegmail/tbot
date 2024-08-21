@@ -415,6 +415,17 @@ def main() -> None:
     global set_folders_except
     global set_folders_prison
     global token
+    global log_dir
+
+    name = 'inventory'
+    fn1 = log_dir + f'/W1_{name}.ah'
+    fn6 = log_dir + f'/W6_{name}.ah'
+
+    with open(fn1, 'w', encoding="utf-8") as f:
+        f.write("{'agt':7, 'med':2, 'kil':8, 'pob':4,'ser':9}")
+    with open(fn6, 'w', encoding="utf-8") as f:
+        f.write("{'agt':1, 'med':2, 'kil':3, 'pob':4,'ser':5}")
+
 
     content = os.listdir(prison_dir)
     set_folders_prison = set([folder for folder in content if os.path.isdir(os.path.join(prison_dir, folder))])
