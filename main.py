@@ -426,6 +426,8 @@ def main() -> None:
     with open(fn6, 'w', encoding="utf-8") as f:
         f.write("{'agt':1, 'med':2, 'kil':3, 'pob':4,'ser':5}")
 
+    # {'agt':8, 'med':4, 'kil':11, 'pob':8,'ser':14 }
+
 
     content = os.listdir(prison_dir)
     set_folders_prison = set([folder for folder in content if os.path.isdir(os.path.join(prison_dir, folder))])
