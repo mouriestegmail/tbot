@@ -191,6 +191,7 @@ def create_inventory_log() -> str:
                     all_a[k] = apples.get(k, 0) + v
 
         except Exception as e:
+            print(fn)
             continue
     return f"\n{name}:\n {str(all_a).replace(' ', '')}"
 
@@ -425,6 +426,10 @@ def main() -> None:
         f.write("{'agt':7, 'med':2, 'kil':8, 'pob':4,'ser':9}")
     with open(fn6, 'w', encoding="utf-8") as f:
         f.write("{'agt':1, 'med':2, 'kil':3, 'pob':4,'ser':5}")
+
+    print(fn1)
+    print(fn6)
+    print("=====")
 
     # {'agt':8, 'med':4, 'kil':11, 'pob':8,'ser':14 }
 
