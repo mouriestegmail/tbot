@@ -111,6 +111,15 @@ def format_text(text):
                     l = l.replace(', ', ',')
 
                 formatted_lines.append(l)
+
+            else:
+                l = line
+                if flag or len(l) > 35:
+                    l = l.replace(': ', ':')
+                if len(l) > 35:
+                    l = l.replace(', ', ',')
+
+                formatted_lines.append(l)
         else:
             formatted_lines.append(line)
 
