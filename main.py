@@ -360,6 +360,22 @@ async def make_fn(chat_id, context: ContextTypes.DEFAULT_TYPE, text):
             await context.bot.send_photo(chat_id=chat_id, photo=photo)
         await asyncio.sleep(0.5)
 
+async def make_time(chat_id, context:ContextTypes.DEFAULT_TYPE):
+    global log_dir
+    dir_ss = log_dir
+
+    for i in range(1,7):
+        name = f"W{i}"
+        fn = f'{name}.time'
+        text = ""
+        try:
+            with open(fn, 'r') as file:
+                text += f'{name}: {file.readline().strip()} \n'
+        except Exception as e:
+            print(e)
+            text += f'{name}: err \n'
+
+    await context.bot.send_message(chat_id=chat_id, text=text)
 
 
 async def make_screenshot(chat_id, context: ContextTypes.DEFAULT_TYPE, full=False) -> None:
@@ -425,12 +441,13 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await make_ss(chat_id, context, text=text)
     elif "fn" in text:
         await make_fn(chat_id, context, text=text)
-
+    elif "time" in text:
+        await make_time(chat_id, context)
     elif "fshot" in text:
         await make_screenshot(chat_id, context, full=True)
     elif "shot" in text:
         await make_screenshot(chat_id, context)
-    elif "fulllog" in text or "flog" in text:
+    elif "full" in text or "flog" in text:
         await make_log(chat_id, context, full=True)
     elif "log" in text:
         integer_value = 5
