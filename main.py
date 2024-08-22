@@ -310,6 +310,22 @@ async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=30, full=F
             await context.bot.send_document(chat_id=chat_id, document=text_file, filename='full.log')
 
 
+async def make_get_file(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
+    global log_dir
+
+    fn = text.replace("get", "").replace(" ", "")
+
+    filename = log_dir + f'/{fn}'
+    name = fn.split("/")[-1]
+    print(filename)
+    try:
+        with open(filename, 'rb') as text_file:
+            await context.bot.send_document(chat_id=chat_id, document=text_file, filename=name)
+            return
+    except Exception as e:
+        await context.bot.send_message(chat_id=chat_id, text=f'err {e}')
+
+
 async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     global log_dir
 
@@ -474,6 +490,8 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     if "ss" in text:
         await make_ss(chat_id, context, text=text)
+    elif "get" in text:
+        await make_get_file(chat_id=chat_id, context=context, text=text)
     elif "file" in text:
         await make_files(chat_id, context)
     elif "fn" in text:
