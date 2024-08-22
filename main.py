@@ -7,6 +7,7 @@ import os
 from datetime import datetime
 import configparser
 import pathlib
+import asyncio
 
 log_dir = ""
 prison_dir = ""
@@ -310,7 +311,6 @@ async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=30, full=F
 
 async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     global log_dir
-    current_time = datetime.now()
 
     dir_ss = log_dir + "/ss"
 
@@ -331,12 +331,34 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
         if os.path.isfile(full_path):
             files_list.append(full_path)
 
-    import asyncio
-
     for fn in files_list:
         with open(fn, 'rb') as file:
             await context.bot.send_document(chat_id=chat_id, document=file, filename=file.name)
         await asyncio.sleep(0.5)
+
+
+def get_all_files(template: str, folder: str) -> list:
+    res = []
+    for root, dirs, files in os.walk(folder):
+        for file in files:
+            if template in file:
+                res.append(os.path.join(root, file))
+    return res
+
+
+async def make_fn(chat_id, context: ContextTypes.DEFAULT_TYPE, text):
+    global log_dir
+    dir_ss = log_dir + "/ss"
+
+    name = text.replace("fn", "").replace(" ", "")
+
+    fns = get_all_files(name, dir_ss)
+
+    for fn in fns:
+        with open(fn, 'rb') as photo:
+            await context.bot.send_photo(chat_id=chat_id, photo=photo)
+        await asyncio.sleep(0.5)
+
 
 
 async def make_screenshot(chat_id, context: ContextTypes.DEFAULT_TYPE, full=False) -> None:
@@ -390,6 +412,8 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     if "ss" in text:
         await make_ss(chat_id, context, text=text)
+    elif "fn" in text:
+        await make_fn(chat_id, context, text=text)
 
     elif "fshot" in text:
         await make_screenshot(chat_id, context, full=True)
