@@ -521,16 +521,16 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await make_history(chat_id, context)
     else:
         text = """
-    ss      - screnshot from workers [ss w1]
-    get     - get file           [get w1.ah]
-    file    - get tree of files 
-    fn      - screenshot name        [fn ah]
-    time    - last ah update 
-    full    - get curr file log
-    log     - log                    [log30]
-    comm    - create command      [comm buy]
-    sum     - summary
-    history - 14 day history
+ss    - shot from workers [ss w1]
+get   - get file      [get w1.ah]
+file  - get tree of files 
+fn    - screenshot name   [fn ah]
+time  - last ah update 
+full  - get curr file log
+log   - log               [log30]
+comm  - create command [comm buy]
+sum   - summary
+history - 14 day history
         """
         text = "```help\n" + text + "\n```"
         await context.bot.send_message(chat_id=andrei, text=text, parse_mode='Markdown')
