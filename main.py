@@ -426,6 +426,39 @@ def get_last_commit_message() -> str:
     )
     return result.stdout.strip()
 
+
+import os
+
+
+def files_tree() -> str:
+    global log_dir
+    start_dir = log_dir
+    def build_tree(dir_path: str, prefix: str = "") -> str:
+        tree_str = ""
+        entries = sorted(os.listdir(dir_path))  # Сортируем файлы и каталоги по имени
+        total_entries = len(entries)
+
+        for index, entry in enumerate(entries):
+            path = os.path.join(dir_path, entry)
+            is_last = index == total_entries - 1
+
+            # Добавляем текущий элемент к дереву
+            tree_str += prefix + ("└── " if is_last else "├── ") + entry + "\n"
+
+            # Если это директория, рекурсивно строим дерево
+            if os.path.isdir(path):
+                new_prefix = prefix + ("    " if is_last else "│   ")
+                tree_str += build_tree(path, new_prefix)
+
+        return tree_str
+
+    return build_tree(start_dir).rstrip()
+
+async def make_files(chat_id, context:ContextTypes.DEFAULT_TYPE):
+    text = "'''" + files_tree() + "'''"
+    await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+
+
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_message.chat_id
     global flag_alarm
@@ -441,6 +474,8 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     if "ss" in text:
         await make_ss(chat_id, context, text=text)
+    elif "file" in text:
+        await make_files(chat_id, context)
     elif "fn" in text:
         await make_fn(chat_id, context, text=text)
     elif "time" in text:
