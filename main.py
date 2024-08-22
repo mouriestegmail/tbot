@@ -521,14 +521,14 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await make_history(chat_id, context)
     else:
         text = """''' help:
-    ss  -   - screnshot from workers
-    get     - get file
-    file    - get tree of files
-    fn      - screenshot name
-    time    - last ah update
+    ss      - screnshot from workers [ss w1]
+    get     - get file           [get w1.ah]
+    file    - get tree of files 
+    fn      - screenshot name        [fn ah]
+    time    - last ah update 
     full    - get curr file log
-    log     - log
-    comm    - ex: comm buy
+    log     - log                    [log30]
+    comm    - create command      [comm buy]
     sum     - summary
     history - 14 day history
         '''"""
