@@ -519,10 +519,28 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await make_sum(chat_id, context)
     elif "history" in text:
         await make_history(chat_id, context)
+    elif "help" == text:
+        text = """'''
+    ss  -   - screnshot from workers
+    get     - get file
+    file    - get tree of files
+    fn      - screenshot name
+    time    - last ah update
+    full    - get curr file log
+    log     - log
+    comm    - ex: comm buy
+    sum     - summary
+    history - 14 day history
+        '''"""
+        await context.bot.send_message(chat_id=andrei, text=text, parse_mode='Markdown')
 
     if flag_alarm:
         context.job_queue.run_repeating(alarm, 1, chat_id=chat_id, name=str(chat_id))
         flag_alarm = False
+
+
+
+
 
 
 def main() -> None:
