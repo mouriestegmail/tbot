@@ -380,7 +380,7 @@ async def make_time(chat_id, context:ContextTypes.DEFAULT_TYPE):
     global log_dir
     dir_ss = log_dir
 
-    text = ""
+    text = "```time"
 
     for i in range(1,7):
         name = f"W{i}"
@@ -392,8 +392,8 @@ async def make_time(chat_id, context:ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             print(e)
             text += f'{name}: err \n'
-
-    await context.bot.send_message(chat_id=chat_id, text=text)
+    text += "```"
+    await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 
 async def make_screenshot(chat_id, context: ContextTypes.DEFAULT_TYPE, full=False) -> None:
