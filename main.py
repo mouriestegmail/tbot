@@ -420,7 +420,7 @@ async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
 
 def get_last_commit_message() -> str:
     result = subprocess.run(
-        ['git', 'log', '-1', '--pretty=%B'],
+        ['git', 'log', '-1', '--pretty=%h [%cd]', '--date=format:%Y-%m-%d %H:%M:%S'],
         capture_output=True,
         text=True
     )
