@@ -519,8 +519,8 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await make_sum(chat_id, context)
     elif "history" in text:
         await make_history(chat_id, context)
-    elif "help" == text:
-        text = """'''
+    else:
+        text = """''' help:
     ss  -   - screnshot from workers
     get     - get file
     file    - get tree of files
