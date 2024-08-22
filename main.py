@@ -364,10 +364,12 @@ async def make_time(chat_id, context:ContextTypes.DEFAULT_TYPE):
     global log_dir
     dir_ss = log_dir
 
+    text = ""
+
     for i in range(1,7):
         name = f"W{i}"
         fn = f'{name}.time'
-        text = ""
+
         try:
             with open(fn, 'r') as file:
                 text += f'{name}: {file.readline().strip()} \n'
