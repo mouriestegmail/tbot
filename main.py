@@ -448,7 +448,7 @@ import os
 
 def files_tree() -> str:
     global log_dir
-    start_dir = log_dir
+    start_dir = os.path.expanduser(log_dir)
     def build_tree(dir_path: str, prefix: str = "") -> str:
         tree_str = ""
         entries = sorted(os.listdir(dir_path))  # Сортируем файлы и каталоги по имени
@@ -471,7 +471,7 @@ def files_tree() -> str:
     return build_tree(start_dir).rstrip()
 
 async def make_files(chat_id, context:ContextTypes.DEFAULT_TYPE):
-    text = "```" + files_tree() + "```"
+    text = "```tree\n" + files_tree() + "```"
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 
