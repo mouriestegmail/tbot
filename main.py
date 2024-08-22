@@ -360,6 +360,7 @@ def get_all_files(template: str, folder: str) -> list:
         for file in files:
             if template in file:
                 res.append(os.path.join(root, file))
+
     return res
 
 
@@ -520,8 +521,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif "history" in text:
         await make_history(chat_id, context)
     else:
-        text = """
-ss    - shot from workers [ss w1]
+        text = """ss    - shot from workers [ss w1]
 get   - get file      [get w1.ah]
 file  - get tree of files 
 fn    - screenshot name   [fn ah]
