@@ -8,6 +8,7 @@ from datetime import datetime
 import configparser
 import pathlib
 import asyncio
+import subprocess
 
 log_dir = ""
 prison_dir = ""
@@ -399,6 +400,13 @@ async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
             await make_log(chat_id=andrei, context=context, count=30)
             await context.bot.send_document(chat_id=andrei, document=file, filename='except.jpg')
 
+def get_last_commit_message() -> str:
+    result = subprocess.run(
+        ['git', 'log', '-1', '--pretty=%B'],
+        capture_output=True,
+        text=True
+    )
+    return result.stdout.strip()
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_message.chat_id
@@ -407,6 +415,9 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if chat_id not in users:
         return
     text = update.message.text.lower()
+
+    await context.bot.send_message(chat_id=chat_id, text=get_last_commit_message())
+
     if chat_id == martin:
         await context.bot.send_message(chat_id=andrei, text=f"Martin say: {text}")
 
