@@ -401,6 +401,10 @@ async def make_time(chat_id, context:ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             print(e)
             text += f'{name}: err \n'
+
+    filename = log_dir + f'/money.txt'
+    with open(filename, 'r') as file:
+        text += "".join(list(file.readlines()))
     text += "```"
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
