@@ -1,4 +1,6 @@
 import logging
+import time
+
 import pyautogui
 from telegram.ext import Application, ContextTypes, MessageHandler, filters
 from telegram import ReplyKeyboardMarkup, Update
@@ -381,7 +383,7 @@ async def make_time(chat_id, context:ContextTypes.DEFAULT_TYPE):
     global log_dir
     dir_ss = log_dir
 
-    text = "```time"
+    text = "```time\n"
 
     for i in range(1,7):
         name = f"W{i}"
@@ -389,7 +391,13 @@ async def make_time(chat_id, context:ContextTypes.DEFAULT_TYPE):
 
         try:
             with open(fn, 'r') as file:
-                text += f'{name}: {file.readline().strip()} \n'
+                items = file.readline().split(" ")
+                t = float(items[0].replace(" ", ""))
+                c = items[1]
+                cur_t = time.time()
+                diff = int((cur_t - t)//60)
+
+                text += f'{name}: {diff}m  [{c}]\n'
         except Exception as e:
             print(e)
             text += f'{name}: err \n'
