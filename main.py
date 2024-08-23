@@ -83,6 +83,13 @@ def read_config():
 
 import re
 
+
+def split_text_into_chunks(text: str, lines_per_chunk: int = 30) -> list:
+    lines = text.splitlines()
+    chunks = [lines[i:i + lines_per_chunk] for i in range(0, len(lines), lines_per_chunk)]
+    chunks = ['\n'.join(chunk) for chunk in chunks]
+    return chunks
+
 def format_text(text):
     text = text.replace('agt', 'a')
     text = text.replace('med', 'm')
@@ -484,8 +491,15 @@ def files_tree() -> str:
     return build_tree(start_dir).rstrip()
 
 async def make_files(chat_id, context:ContextTypes.DEFAULT_TYPE):
-    text = "```tree\n" + files_tree() + "```"
-    await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+    text = files_tree()
+
+    chunks = split_text_into_chunks(text)
+
+    for item in chunks:
+        text = "```\n" + item + "```"
+        await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+        await asyncio.sleep(0.2)
+
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
