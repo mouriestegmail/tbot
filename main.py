@@ -395,7 +395,7 @@ async def make_time(chat_id, context:ContextTypes.DEFAULT_TYPE):
                 t = float(items[0].replace(" ", ""))
                 c = items[1]
                 cur_t = time.time()
-                diff = int((cur_t - t)//60)
+                diff = (cur_t - t)//6/10
 
                 text += f'{name}: {diff}m  [{c.strip()}]\n'
         except Exception as e:
