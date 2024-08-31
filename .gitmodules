@@ -1,0 +1,3 @@
+[submodule "mnbot"]
+	path = mnbot
+	url = https://github.com/mouriestegmail/mnbot.git
