@@ -199,7 +199,7 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 def create_inventory_log() -> str:
     global log_dir
     dir_ss = log_dir + "/ss"
-
+    print(grap_image.get_inventory_apples)
     return grap_image.get_inventory_apples(dir_ss=dir_ss)
 
     #
