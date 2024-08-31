@@ -15,6 +15,8 @@ def get_inventory_apples(dir_ss) -> str:
 
     fns = file_utils.get_all_files(fn_tmp, dir_ss)
 
+    print(fns)
+
     apples = dict()
     sum = 0
 
