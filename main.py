@@ -202,25 +202,25 @@ def create_inventory_log() -> str:
 
     return grap_image.get_inventory_apples(dir_ss=dir_ss)
 
-
-    global log_dir
-    all_a = dict()
-    name = 'inventory'
-    for i in range (1,7):
-        fn = log_dir + f'/W{i}_{name}.ah'
-        try:
-            with open(fn, 'r') as file:
-                first_line = file.readline().strip()
-                apples = eval(first_line)
-                apples = dict(sorted(apples.items()))
-
-                for k, v in apples.items():
-                    all_a[k] = apples.get(k, 0) + v
-
-        except Exception as e:
-            print(fn)
-            continue
-    return f"\n{name}:\n {str(all_a).replace(' ', '')}"
+    #
+    # global log_dir
+    # all_a = dict()
+    # name = 'inventory'
+    # for i in range (1,7):
+    #     fn = log_dir + f'/W{i}_{name}.ah'
+    #     try:
+    #         with open(fn, 'r') as file:
+    #             first_line = file.readline().strip()
+    #             apples = eval(first_line)
+    #             apples = dict(sorted(apples.items()))
+    #
+    #             for k, v in apples.items():
+    #                 all_a[k] = apples.get(k, 0) + v
+    #
+    #     except Exception as e:
+    #         print(fn)
+    #         continue
+    # return f"\n{name}:\n {str(all_a).replace(' ', '')}"
 
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     global log_dir
