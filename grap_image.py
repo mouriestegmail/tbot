@@ -12,9 +12,12 @@ except Exception as e:
 def get_inventory_apples(dir_ss) -> str:
     print("test")
     fn_tmp = "inv.png"
+    print(dir_ss, fn_tmp)
 
-    fns = file_utils.get_all_files(fn_tmp, dir_ss)
-
+    try:
+        fns = file_utils.get_all_files(fn_tmp, dir_ss)
+    except Exception as e:
+        print(e)
     print(fns)
 
     apples = dict()
