@@ -371,14 +371,21 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
             await context.bot.send_document(chat_id=chat_id, document=file, filename=file.name)
         await asyncio.sleep(0.5)
 
+def get_all_files(template: str, folder: str) -> list:
+    res = []
+    for root, dirs, files in os.walk(folder):
+        for file in files:
+            if template in file:
+                res.append(os.path.join(root, file))
 
+    return res
 async def make_fn(chat_id, context: ContextTypes.DEFAULT_TYPE, text):
     global log_dir
     dir_ss = log_dir + "/ss"
 
     name = text.replace("fn", "").replace(" ", "")
 
-    fns = file_utils.get_all_files(name, dir_ss)
+    fns = get_all_files(name, dir_ss)
 
     for fn in fns:
         with open(fn, 'rb') as photo:

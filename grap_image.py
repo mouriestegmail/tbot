@@ -3,12 +3,21 @@ try:
     import mnbot.helper_items as hi
     import mnbot.readconf as mn_conf
     import file_utils
+    import os
 
     sys.path.append('./mnbot')
     config = mn_conf.Config()
 except Exception as e:
     print(e)
 
+def get_all_files(template: str, folder: str) -> list:
+    res = []
+    for root, dirs, files in os.walk(folder):
+        for file in files:
+            if template in file:
+                res.append(os.path.join(root, file))
+
+    return res
 def get_inventory_apples(dir_ss) -> str:
     print("test")
     fn_tmp = "inv.png"
