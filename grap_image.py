@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./mnbot')
 import mnbot.helper_items as hi
 import mnbot.global_const as mn_gc
 import mnbot.readconf as mn_conf
