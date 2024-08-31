@@ -11,6 +11,8 @@ import configparser
 import pathlib
 import asyncio
 import subprocess
+import file_utils
+import grap_image
 
 log_dir = ""
 prison_dir = ""
@@ -193,7 +195,14 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
+
 def create_inventory_log() -> str:
+    global log_dir
+    dir_ss = log_dir + "/ss"
+
+    return grap_image.get_inventory_apples(dir_ss=dir_ss)
+
+
     global log_dir
     all_a = dict()
     name = 'inventory'
@@ -363,23 +372,13 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
         await asyncio.sleep(0.5)
 
 
-def get_all_files(template: str, folder: str) -> list:
-    res = []
-    for root, dirs, files in os.walk(folder):
-        for file in files:
-            if template in file:
-                res.append(os.path.join(root, file))
-
-    return res
-
-
 async def make_fn(chat_id, context: ContextTypes.DEFAULT_TYPE, text):
     global log_dir
     dir_ss = log_dir + "/ss"
 
     name = text.replace("fn", "").replace(" ", "")
 
-    fns = get_all_files(name, dir_ss)
+    fns = file_utils.get_all_files(name, dir_ss)
 
     for fn in fns:
         with open(fn, 'rb') as photo:
