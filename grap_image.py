@@ -1,15 +1,16 @@
-import sys
-sys.path.append('./mnbot')
-import mnbot.helper_items as hi
-import mnbot.global_const as mn_gc
-import mnbot.readconf as mn_conf
-import file_utils
+try:
+    import sys
+    import mnbot.helper_items as hi
+    import mnbot.readconf as mn_conf
+    import file_utils
 
-mn_gc.file_config = "C:/share/config.json"
-
-config = mn_conf.Config()
+    sys.path.append('./mnbot')
+    config = mn_conf.Config()
+except Exception as e:
+    print(e)
 
 def get_inventory_apples(dir_ss) -> str:
+    print("test")
     fn_tmp = "inv.png"
 
     fns = file_utils.get_all_files(fn_tmp, dir_ss)
