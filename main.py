@@ -205,7 +205,7 @@ def create_inventory_log() -> str:
              apples = dict(sorted(apples.items()))
              s = sum(apples.values())
 
-             return f"\n{str(all_a)} {s}"
+             return f"\ninventory:\n{str(all_a)} {s}"
     except Exception as e:
         print(f"except: {e}")
     return "No data"
@@ -284,7 +284,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                             text += "\n" + str(apples).replace(" ", "").replace(": ",":") + f' {s}'
                         else:
                             t = delta_t_real//6/10
-                            text += f"timeout : {t}"
+                            text += f"\ntimeout : {t}"
                         # text += p + "\n" + str(apples)
                 except Exception as e:
                     print(e)
