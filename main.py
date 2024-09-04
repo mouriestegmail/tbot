@@ -196,22 +196,19 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 def create_inventory_log() -> str:
     global log_dir
     all_a = dict()
-    name = 'inventory'
-    for i in range (1,7):
-        fn = log_dir + f'/W{i}_{name}.ah'
-        try:
-            with open(fn, 'r') as file:
-                first_line = file.readline().strip()
-                apples = eval(first_line)
-                apples = dict(sorted(apples.items()))
 
-                for k, v in apples.items():
-                    all_a[k] = apples.get(k, 0) + v
+    fn = log_dir + f'/inventory.ah'
+    try:
+        with open(fn, 'r') as file:
+             first_line = file.readline().strip()
+             apples = eval(first_line)
+             apples = dict(sorted(apples.items()))
+             s = sum(apples.values())
 
-        except Exception as e:
-            print(fn)
-            continue
-    return f"\n{name}:\n {str(all_a).replace(' ', '')}"
+             return f"\n{str(all_a)} {s}"
+    except Exception as e:
+        print(f"except: {e}")
+    return "No data"
 
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     global log_dir
@@ -265,16 +262,29 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                         if filename == s_f:
                             text += "\nsumm:\n" + str(sum_dict).replace(" ", "") + f' {ss}' + "\nstorage:\n"
                         ah_max = "?"
-                        for k, v in apples.items():
-                            if k != 'z' and k != 'max':
-                                s += v
-                                ss += v
-                            sum_dict[k] = sum_dict.get(k, 0) + v
 
-                            if k == 'max':
-                                ah_max=str(v)
+                        last_modified_time = os.path.getmtime(filename)
+                        current_time = time.time()
+                        h = datetime.now().hour
+                        delta_t = 60 * 5
+                        if 1 < h < 9:
+                            delta_t = 60 * 30
 
-                        text += "\n" + str(apples).replace(" ", "").replace(": ",":") + f' {s}'
+                        delta_t_real = current_time - last_modified_time
+
+                        if delta_t_real <= delta_t:
+                            for k, v in apples.items():
+                                if k != 'z' and k != 'max':
+                                    s += v
+                                    ss += v
+                                sum_dict[k] = sum_dict.get(k, 0) + v
+
+                                if k == 'max':
+                                    ah_max=str(v)
+                            text += "\n" + str(apples).replace(" ", "").replace(": ",":") + f' {s}'
+                        else:
+                            t = delta_t_real//6/10
+                            text += f"timeout : {t}"
                         # text += p + "\n" + str(apples)
                 except Exception as e:
                     print(e)
