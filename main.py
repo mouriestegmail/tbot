@@ -98,6 +98,10 @@ def format_text(text):
     text = text.replace('kil', 'k')
     text = text.replace("'", "")
     text = "```log\n" + text + "\n```"
+    print(text)
+    return text
+
+    print(text)
 
     lines = [line for line in text.strip().split('\n') if line]
 
@@ -110,17 +114,21 @@ def format_text(text):
             line = re.sub(r'\s+', ' ', line.strip())
             match = re.match(r"(\{.*\})\s+(\d+)", line)
             if match:
+                """
+                print(line)
                 dictionary_part = match.group(1)
                 number_part = match.group(2)
                 pairs = re.findall(r'(\w:)(\d+)', dictionary_part)
                 formatted_pairs = ', '.join(f"{key}{int(value):2}" for key, value in pairs)
                 formatted_dict_part = f"{{{formatted_pairs}}}"
                 l = f"{formatted_dict_part} {number_part}"
+                """
+                l = line
                 if flag or len(l) > 35:
                     l = l.replace(': ', ':')
                 if len(l) > 35:
                     l = l.replace(', ', ',')
-
+                print(f"l :[{l}]")
                 formatted_lines.append(l)
 
             else:
@@ -195,17 +203,16 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 def create_inventory_log() -> str:
     global log_dir
-    all_a = dict()
 
     fn = log_dir + f'/inventory.ah'
     try:
         with open(fn, 'r') as file:
-             first_line = file.readline().strip()
-             apples = eval(first_line)
-             apples = dict(sorted(apples.items()))
-             s = sum(apples.values())
-
-             return f"\ninventory:\n{str(all_a)} {s}"
+            first_line = file.readline().strip()
+            apples = eval(first_line)
+            apples = dict(sorted(apples.items()))
+            s = sum(apples.values())
+            print (apples)
+            return f"\ninventory:\n{str(apples)} {s}"
     except Exception as e:
         print(f"except: {e}")
     return "No data"
@@ -213,7 +220,7 @@ def create_inventory_log() -> str:
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     global log_dir
     current_time = datetime.now()
-    text = "sold:\n"
+    text = "sold:"
     print("make_sum")
     ss = 0
     all_a = eval("{'agt':0, 'med':0, 'kil':0, 'pob':0,'ser':0}")
@@ -239,7 +246,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
             print(e)
             text += "\n err"
     text += (f"\nsumm:"
-             f'\n{str(all_a).replace(" ", "")}  {ss}\n\nAH:')
+             f'\n{str(all_a).replace(" ", "")}  {ss}\nAH:')
 
     f_list = []
     for i in range(1, 7):
