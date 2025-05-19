@@ -12,6 +12,8 @@ import pathlib
 import asyncio
 import subprocess
 from PIL import Image
+import json
+import shutil
 
 log_dir = ""
 prison_dir = ""
@@ -323,6 +325,121 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     await context.bot.send_message(chat_id=chat_id, text=f"free space: {free//(2**30)} GB")
     make_money(chat_id, )
 
+async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
+    global log_dir
+    fn = log_dir + f'\\config.json'
+
+    with open(fn, "r") as f:
+        data = json.load(f)
+
+    lines = []
+    for item in data["apples"]:
+        name = item["name"]
+        cost_mil = item["cost"] / 1_000_000
+        lines.append(f"{name}: {cost_mil:.1f}")
+
+    lines.append(f"\ninv: {data['max_inventory']}")
+
+    text = "\n".join(lines)
+
+    text = "```conf\n" + text + "\n```"
+    await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+
+async def set_conf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
+    global log_dir
+    fn = log_dir + f'\\config.json'
+    l = text.split(" ")
+    print(l)
+
+    if len(l) != 2 or "setconf" not in l[0]:
+        await context.bot.send_message(chat_id=chat_id, text="bad setconf")
+        return
+
+    command = l[1]
+
+    # Проверка формата команды
+    pattern = re.compile(r"^[a-z]+=\d{1,3}(?:_\d{3})+$")
+    if not pattern.fullmatch(command):
+        await context.bot.send_message(chat_id=chat_id, text="Неверный формат команды. \nПример: setconf pob=4_300_000")
+        return
+
+    key, val = command.split("=")
+    parts = val.split("_")
+    if any(len(p) != 3 for p in parts[1:]):
+        await context.bot.send_message(chat_id=chat_id, text="Неверный формат стоимости. \nПример: setconf pob=4_300_000")
+        return
+
+    cost = int(val.replace("_", ""))
+    if cost < 100_000 or cost > 10_000_000:
+        await context.bot.send_message(chat_id=chat_id,
+                                       text="Неверное значение стоимости. [100k-10m]")
+        return
+
+    # Загрузка JSON
+    try:
+        with open(fn, "r") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        await context.bot.send_message(chat_id=chat_id, text=f"Файл не найден: {fn}")
+        return
+    except json.JSONDecodeError as e:
+        await context.bot.send_message(chat_id=chat_id, text=f"Ошибка разбора JSON: {e}")
+        return
+    except Exception as e:
+        await context.bot.send_message(chat_id=chat_id, text=f"Ошибка при чтении: {e}")
+        return
+
+    # Проверка структуры
+    if "apples" not in data or not isinstance(data["apples"], list):
+        await context.bot.send_message(chat_id=chat_id, text="Ошибка: структура JSON некорректна — отсутствует список 'apples'")
+        return
+
+    # Обновление стоимости
+    found = False
+    for item in data["apples"]:
+        if item.get("name") == key:
+            item["cost"] = cost
+            found = True
+            break
+
+    if not found:
+        await context.bot.send_message(chat_id=chat_id,
+                                       text=f"Элемент с именем '{key}' не найден в apples — файл не изменён")
+        return
+
+    # Создание резервной копии
+    backup_filename = fn + ".bak"
+    try:
+        shutil.copyfile(fn, backup_filename)
+    except Exception as e:
+        await context.bot.send_message(chat_id=chat_id,
+                                       text=f"Не удалось создать резервную копию. Файл не будет изменён.\nОшибка: {e}")
+        return
+
+    # Запись во временный файл
+    temp_filename = fn + ".tmp"
+    try:
+        with open(temp_filename, "w") as f:
+            json.dump(data, f, indent=2)
+
+        with open(temp_filename, "r") as f:
+            json.load(f)  # проверка валидности
+
+        shutil.move(temp_filename, fn)  # атомарная замена
+        await make_conf(chat_id, context)
+
+    except Exception as e:
+        await context.bot.send_message(chat_id=chat_id,
+                                       text=f"Ошибка при записи. \nВосстановление из резервной копии... {e}")
+        print("Ошибка при записи. Восстановление из резервной копии...")
+
+        if os.path.exists(backup_filename):
+            shutil.copyfile(backup_filename, fn)
+
+        if os.path.exists(temp_filename):
+            os.remove(temp_filename)
+
+
 
 async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=30, full=False) -> None:
     global log_dir
@@ -597,6 +714,10 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         # await make_log(chat_id, context, count=5)
         await make_money(chat_id, context)
         await make_sum(chat_id, context)
+    elif "setconf" in text:
+        await make_setconf(chat_id, context, text)
+    elif "conf" in text:
+        await make_conf(chat_id, context)
         
     elif "history" in text:
         await make_history(chat_id, context)
