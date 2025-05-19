@@ -6,4 +6,5 @@ ping3
 pyperclip
 pytesseract
 Requests
-opencv-python
+opencv-python   
+python-telegram-bot

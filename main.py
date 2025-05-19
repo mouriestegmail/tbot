@@ -11,6 +11,7 @@ import configparser
 import pathlib
 import asyncio
 import subprocess
+from PIL import Image
 
 log_dir = ""
 prison_dir = ""
@@ -18,6 +19,7 @@ commands_dir = ""
 except_dir = ""
 token = ""
 a = 0
+workers = 7 + 1
 
 set_folders_prison = set()
 set_folders_except = set()
@@ -178,9 +180,9 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         all_a = eval("{'agt':0, 'kil':0, 'med':0,'pob':0,'ser':0}")
 
-        for i in range (1,7):
+        for i in range (1,workers):
             try:
-                filename = log_dir + f'\\{current_time.strftime("%d.%m.%Y")}_W{i}.sold'
+                filename = log_dir + f'\\{current_time.strftime("%d.%m.%Y")}_A{i}.sold'
 
                 with open(filename, 'r') as file:
                     first_line = file.readline().strip()
@@ -215,7 +217,7 @@ def create_inventory_log() -> str:
             return f"\ninventory:\n{str(apples)} {s}"
     except Exception as e:
         print(f"except: {e}")
-    return "No data"
+    return "\nNo data"
 
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     global log_dir
@@ -225,9 +227,9 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     ss = 0
     all_a = eval("{'agt':0, 'med':0, 'kil':0, 'pob':0,'ser':0}")
 
-    for i in range (1,7):
+    for i in range (1,workers):
         try:
-            filename = log_dir + f'\\{current_time.strftime("%d.%m.%Y")}_W{i}.sold'
+            filename = log_dir + f'\\{current_time.strftime("%d.%m.%Y")}_A{i}.sold'
 
             with open(filename, 'r') as file:
                 first_line = file.readline().strip()
@@ -249,8 +251,8 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
              f'\n{str(all_a).replace(" ", "")}  {ss}\nAH:')
 
     f_list = []
-    for i in range(1, 7):
-        f_list.append(log_dir + f'\\W{i}.ah')
+    for i in range(1, workers):
+        f_list.append(log_dir + f'\\A{i}.ah')
 
     s_f = log_dir + f'\\storage.ah'
     f_list.append(s_f)
@@ -313,6 +315,13 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = format_text(text)
     text = text.replace(" z:", "  ")
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+    import shutil
+
+    total, used, free = shutil.disk_usage("C:\\")
+
+
+    await context.bot.send_message(chat_id=chat_id, text=f"free space: {free//(2**30)} GB")
+    make_money(chat_id, )
 
 
 async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=30, full=False) -> None:
@@ -379,6 +388,32 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
             await context.bot.send_document(chat_id=chat_id, document=file, filename=file.name)
         await asyncio.sleep(0.5)
 
+async def make_money(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
+    global log_dir
+    dir_ss = log_dir + "/ss"
+    crop_file = log_dir + "/cropped_money.png"
+
+    name = "money"
+
+    fns = get_all_files(name, dir_ss)
+
+    print(fns)
+
+    latest_file = max(fns, key=os.path.getmtime)
+
+    print(latest_file)
+
+    img = Image.open(latest_file)
+
+    crop_box = (110, 370, 80+150, 360+100)
+    cropped_img = img.crop(crop_box)
+
+    cropped_img.save(crop_file)
+
+    with open(crop_file, 'rb') as photo:
+        await context.bot.send_photo(chat_id=chat_id, photo=photo)
+        await asyncio.sleep(0.5)
+
 
 def get_all_files(template: str, folder: str) -> list:
     res = []
@@ -409,8 +444,8 @@ async def make_time(chat_id, context:ContextTypes.DEFAULT_TYPE):
 
     text = "```time\n"
 
-    for i in range(1,7):
-        name = f"W{i}"
+    for i in range(1,workers):
+        name = f"A{i}"
         fn = f'{dir_ss}/{name}.time'
 
         try:
@@ -559,8 +594,10 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         print(text)
         await create_command(chat_id, context, text)
     elif "sum" in text:
-        await make_log(chat_id, context, count=5)
+        # await make_log(chat_id, context, count=5)
+        await make_money(chat_id, context)
         await make_sum(chat_id, context)
+        
     elif "history" in text:
         await make_history(chat_id, context)
     else:
@@ -595,17 +632,17 @@ def main() -> None:
     global log_dir
 
     name = 'inventory'
-    fn1 = log_dir + f'/W1_{name}.ah'
-    fn6 = log_dir + f'/W6_{name}.ah'
+    #fn1 = log_dir + f'/W1_{name}.ah'
+    #fn6 = log_dir + f'/A6_{name}.ah'
 
-    with open(fn1, 'w', encoding="utf-8") as f:
-        f.write("{'agt':7, 'med':2, 'kil':8, 'pob':4,'ser':9}")
-    with open(fn6, 'w', encoding="utf-8") as f:
-        f.write("{'agt':1, 'med':2, 'kil':3, 'pob':4,'ser':5}")
+    #with open(fn1, 'w', encoding="utf-8") as f:
+    #    f.write("{'agt':7, 'med':2, 'kil':8, 'pob':4,'ser':9}")
+    #with open(fn6, 'w', encoding="utf-8") as f:
+    #    f.write("{'agt':1, 'med':2, 'kil':3, 'pob':4,'ser':5}")
 
-    print(fn1)
-    print(fn6)
-    print("=====")
+    #print(fn1)
+    #print(fn6)
+    #print("=====")
 
     # {'agt':8, 'med':4, 'kil':11, 'pob':8,'ser':14 }
 
