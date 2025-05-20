@@ -118,15 +118,15 @@ def format_text(text):
             line = re.sub(r'\s+', ' ', line.strip())
             match = re.match(r"(\{.*\})\s+(\d+)", line)
             if match:
-                """
-                print(line)
-                dictionary_part = match.group(1)
-                number_part = match.group(2)
-                pairs = re.findall(r'(\w:)(\d+)', dictionary_part)
-                formatted_pairs = ', '.join(f"{key}{int(value):2}" for key, value in pairs)
-                formatted_dict_part = f"{{{formatted_pairs}}}"
-                l = f"{formatted_dict_part} {number_part}"
-                """
+                # """
+                # print(line)
+                # dictionary_part = match.group(1)
+                # number_part = match.group(2)
+                # pairs = re.findall(r'(\w:)(\d+)', dictionary_part)
+                # formatted_pairs = ', '.join(f"{key}{int(value):2}" for key, value in pairs)
+                # formatted_dict_part = f"{{{formatted_pairs}}}"
+                # l = f"{formatted_dict_part} {number_part}"
+                # """
                 l = line
                 if flag or len(l) > 35:
                     l = l.replace(': ', ':')
@@ -326,8 +326,10 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     make_money(chat_id, )
 
 async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
-    global log_dir
-    fn = log_dir + f'\\config.json'
+    global prison_dir
+    fn = prison_dir + f'\\config.json'
+
+    print(fn)
 
     with open(fn, "r") as f:
         data = json.load(f)
@@ -346,9 +348,10 @@ async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 async def set_conf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
-    global log_dir
-    fn = log_dir + f'\\config.json'
+    global prison_dir
+    fn = prison_dir + f'\\config.json'
     l = text.split(" ")
+    print(fn, text)
     print(l)
 
     if len(l) != 2 or "setconf" not in l[0]:
@@ -358,21 +361,19 @@ async def set_conf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None
     command = l[1]
 
     # Проверка формата команды
-    pattern = re.compile(r"^[a-z]+=\d{1,3}(?:_\d{3})+$")
+    pattern = re.compile(r"^[a-z]+=.+$")
     if not pattern.fullmatch(command):
-        await context.bot.send_message(chat_id=chat_id, text="Неверный формат команды. \nПример: setconf pob=4_300_000")
+        await context.bot.send_message(chat_id=chat_id, text="Неверный формат команды. \nПример: setconf pob=4.3")
         return
 
     key, val = command.split("=")
-    parts = val.split("_")
-    if any(len(p) != 3 for p in parts[1:]):
-        await context.bot.send_message(chat_id=chat_id, text="Неверный формат стоимости. \nПример: setconf pob=4_300_000")
-        return
 
-    cost = int(val.replace("_", ""))
-    if cost < 100_000 or cost > 10_000_000:
+    
+    cost = int(float(val.replace(',', '.')) * 1_000_000)
+
+    if cost < 100_000 or cost > 11_000_000:
         await context.bot.send_message(chat_id=chat_id,
-                                       text="Неверное значение стоимости. [100k-10m]")
+                                       text="Неверное значение стоимости. [0-11]")
         return
 
     # Загрузка JSON
@@ -481,7 +482,7 @@ async def make_get_file(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> No
 async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     global log_dir
 
-    dir_ss = log_dir + "/ss"
+    dir_ss = log_dir + "\\ss"
 
     if not os.path.exists(dir_ss):
         await context.bot.send_message(chat_id=chat_id, text=f'[{dir_ss}] not exist')
@@ -507,16 +508,29 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
 
 async def make_money(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     global log_dir
-    dir_ss = log_dir + "/ss"
+    dir_ss = log_dir + "\\ss"
     crop_file = log_dir + "/cropped_money.png"
 
-    name = "money"
+    money = "money.png"
+    name = "storage"
+
+
 
     fns = get_all_files(name, dir_ss)
-
     print(fns)
 
     latest_file = max(fns, key=os.path.getmtime)
+
+    print(latest_file)
+    try:
+        dir_path = os.path.dirname(latest_file)
+        print(dir_path)  # /some/long/path/to
+    except Exception as e:
+        print(e)
+
+
+
+    latest_file = dir_path + "/money.png"
 
     print(latest_file)
 
@@ -544,7 +558,7 @@ def get_all_files(template: str, folder: str) -> list:
 
 async def make_fn(chat_id, context: ContextTypes.DEFAULT_TYPE, text):
     global log_dir
-    dir_ss = log_dir + "/ss"
+    dir_ss = log_dir + "\\ss"
 
     name = text.replace("fn", "").replace(" ", "")
 
@@ -715,7 +729,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await make_money(chat_id, context)
         await make_sum(chat_id, context)
     elif "setconf" in text:
-        await make_setconf(chat_id, context, text)
+        await set_conf(chat_id, context, text)
     elif "conf" in text:
         await make_conf(chat_id, context)
         
