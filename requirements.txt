@@ -8,3 +8,4 @@ pytesseract
 Requests
 opencv-python   
 python-telegram-bot
+watchdog
