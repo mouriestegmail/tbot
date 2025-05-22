@@ -466,18 +466,43 @@ def get_all_files(template: str, folder: str) -> list:
 
     return res
 
+import os
+import asyncio
+from telegram.ext import ContextTypes
+
+import os
+import asyncio
+from telegram.ext import ContextTypes
+
 async def make_fn(chat_id, context: ContextTypes.DEFAULT_TYPE, text):
     global log_dir
-    dir_ss = log_dir + "\\ss"
+    dir_ss = os.path.join(log_dir, "ss")
 
     name = text.replace("fn", "").replace(" ", "")
-
     fns = get_all_files(name, dir_ss)
 
+    # сортировка по имени родительской папки
+    fns = sorted(fns, key=lambda fn: os.path.basename(os.path.dirname(fn)))
+
     for fn in fns:
-        with open(fn, 'rb') as photo:
-            await context.bot.send_photo(chat_id=chat_id, photo=photo)
-        await asyncio.sleep(0.5)
+        try:
+            folder_name = os.path.basename(os.path.dirname(fn))
+            with open(fn, 'rb') as photo:
+                await context.bot.send_photo(
+                    chat_id=chat_id,
+                    photo=photo,
+                    caption=folder_name,
+                    parse_mode='HTML'
+                )
+            await asyncio.sleep(0.5)
+        except Exception as e:
+            await context.bot.send_message(
+                chat_id=chat_id,
+                text=f"<b>Error sending file:</b> <code>{fn}</code>",
+                parse_mode='HTML'
+            )
+
+
 
 async def make_time(chat_id, context: ContextTypes.DEFAULT_TYPE):
     global log_dir
