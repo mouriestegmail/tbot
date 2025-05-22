@@ -17,6 +17,15 @@ prison_dir = ""
 commands_dir = ""
 except_dir = ""
 token = ""
+config_json = ""
+
+short_to_full = {
+    "kil": "Зелье Киллера",
+    "pob": "Зелье Победителя",
+    "med": "Зелье Медика",
+    "agt": "Зелье Агента",
+    "ser": "Серная кислота",
+}
 
 workers = 7 + 1
 
@@ -246,7 +255,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     global prison_dir
-    fn = prison_dir + f'\\config.json'
+    fn = config_json
 
     print(fn)
 
@@ -265,6 +274,44 @@ async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     text = "```conf\n" + text + "\n```"
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+
+async def make_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
+    fn = config_json
+
+    # Проверка существования файла
+    if not os.path.isfile(fn):
+        text = f"file not found: {fn}"
+        await context.bot.send_message(chat_id=chat_id, text=text)
+        return
+
+    try:
+        with open(fn, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except json.JSONDecodeError as e:
+        text = f"error parse json: {e}"
+        await context.bot.send_message(chat_id=chat_id, text=text)
+        return
+    # Проверка структуры
+    if not isinstance(data, dict) or "autobuy" not in data:
+        print("Файл не содержит ключа 'autobuy'.")
+        text = f"error parse json: no autobuy key"
+        await context.bot.send_message(chat_id=chat_id, text=text)
+        return
+
+    autobuy = data["autobuy"]
+
+    lines = []
+    for short, full_name in short_to_full.items():
+        item = autobuy.get(full_name)
+        if not item:
+            continue
+        price = item.get("buyPrice")
+        if not isinstance(price, (int, float)):
+            lines.append(f"Некорректная цена для '{full_name}': {price}")
+            continue
+        lines.append(f"{short}: {price / 1_000_000:.1f}")
+
+    await context.bot.send_message(chat_id=chat_id, text="\n".join(lines), parse_mode='Markdown')
 
 async def set_conf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
     global prison_dir
@@ -358,6 +405,89 @@ async def set_conf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None
 
         if os.path.exists(temp_filename):
             os.remove(temp_filename)
+
+async def set_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
+    fn = config_json  # path to autobuy.json
+
+    parts = text.strip().split()
+
+    if len(parts) != 2 or parts[0].lower() != "setconf":
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="Invalid command format.\nExample: `setconf ser=4.5`",
+            parse_mode='Markdown'
+        )
+        return
+
+    command = parts[1]
+
+    if not re.fullmatch(r"^[a-z]{3}=[0-9]+([.,][0-9]+)?$", command):
+        await context.bot.send_message(chat_id=chat_id, text="Invalid format.\nExample: `setconf ser=4.5`", parse_mode='Markdown')
+        return
+
+    key, val = command.split("=")
+    key = key.lower()
+    val = val.replace(",", ".")
+
+    try:
+        cost = int(float(val) * 1_000_000)
+    except ValueError:
+        await context.bot.send_message(chat_id=chat_id, text="Invalid price value.")
+        return
+
+    if cost < 100_000 or cost > 11_000_000:
+        await context.bot.send_message(chat_id=chat_id, text="Price must be between 0.1 and 11.0 million.")
+        return
+
+    if key not in short_to_full:
+        await context.bot.send_message(chat_id=chat_id, text=f"Unknown item code: `{key}`", parse_mode='Markdown')
+        return
+
+    full_name = short_to_full[key]
+
+    try:
+        with open(fn, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        await context.bot.send_message(chat_id=chat_id, text=f"Failed to read JSON: {e}")
+        return
+
+    if "autobuy" not in data or not isinstance(data["autobuy"], dict):
+        await context.bot.send_message(chat_id=chat_id, text="Invalid JSON structure: 'autobuy' key missing.")
+        return
+
+    if full_name not in data["autobuy"]:
+        await context.bot.send_message(chat_id=chat_id, text=f"Item '{full_name}' not found in JSON.")
+        return
+
+    backup_fn = fn + ".bak"
+    try:
+        shutil.copyfile(fn, backup_fn)
+    except Exception as e:
+        await context.bot.send_message(chat_id=chat_id, text=f"Could not create backup: {e}")
+        return
+
+    data["autobuy"][full_name]["buyPrice"] = cost
+    temp_fn = fn + ".tmp"
+
+    try:
+        with open(temp_fn, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+        with open(temp_fn, "r", encoding="utf-8") as f:
+            json.load(f)
+
+        shutil.move(temp_fn, fn)
+
+        await make_conf_buyer(chat_id, context)
+
+    except Exception as e:
+        await context.bot.send_message(chat_id=chat_id, text=f"Write error: {e}\nRestoring backup...")
+        if os.path.exists(backup_fn):
+            shutil.copyfile(backup_fn, fn)
+        if os.path.exists(temp_fn):
+            os.remove(temp_fn)
+
 
 async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=30, full=False) -> None:
     global log_dir

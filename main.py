@@ -21,12 +21,24 @@ martin = 799070257
 andrei = 124768943
 users = [andrei, martin]
 
+mode_worker = ""
+mode_buyer = "_buyer"
+mode_dev= "_dev"
+
+mode = mode_worker
 
 
-def read_config(name):
+
+def read_config(arg):
+    global mode
+    if arg == "-b":
+        mode = mode_buyer
+    if arg == "-d":
+        mode = mode_dev
+
     sect = "general"
     config = configparser.ConfigParser()
-    fn = "./config" + name + ".ini"
+    fn = "./config" + mode + ".ini"
     res = config.read(fn)
 
     if len(res) == 0:
@@ -45,9 +57,10 @@ def read_config(name):
     s_commands_dir = "commands_dir"
     s_except_dir = "except_dir"
     s_token = "token"
+    s_config_json = "config_json"
 
     print(s_log_dir)
-    for i in s_log_dir, s_prison_dir, s_commands_dir, s_except_dir, s_token:
+    for i in s_log_dir, s_prison_dir, s_commands_dir, s_except_dir, s_token, s_config_json:
         if i not in config[sect]:
             print(f"check {fn} file: {i}")
             exit(-1)
@@ -57,6 +70,7 @@ def read_config(name):
     messages.commands_dir = config[sect][s_commands_dir]
     messages.except_dir = config[sect][s_except_dir]
     messages.token = config[sect][s_token]
+    messages.config_json = config[sect][s_config_json]
 
     print(log_dir, prison_dir, commands_dir, except_dir, token, sep="\n")
     print(messages.log_dir)
@@ -147,10 +161,16 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await make_money(chat_id, context)
         await make_sum(chat_id, context)
     elif "setconf" in text:
-        await set_conf(chat_id, context, text)
+        if mode == mode_worker:
+            await set_conf(chat_id, context, text)
+        else:
+            await set_conf_buyer(chat_id, context, text)
     elif "conf" in text:
-        await make_conf(chat_id, context)
-        
+        if mode == mode_worker:
+            await make_conf(chat_id, context)
+        else:
+            await make_conf_buyer(chat_id, context)
+
     elif "history" in text:
         await make_history(chat_id, context)
     else:
@@ -212,16 +232,14 @@ class NewFileHandler(FileSystemEventHandler):
 
 
 if __name__ == "__main__":
-    name = ""
+    arg = ""
     if len(sys.argv) == 2:
         arg = sys.argv[1]
-        if arg == '-b':
-            name = "_buyer"
-        elif arg == '-d':
-            name = "_dev"
+        if arg == '-b' or  arg == '-d':
+            pass
         else:
             print(f'undefine arg {arg}. use "-b" or "-d" or empty ')
             exit(-1)
-    print(name)
-    read_config(name)
+    print(arg)
+    read_config(arg)
     main()
