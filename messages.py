@@ -400,7 +400,7 @@ async def set_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -
     if len(parts) != 2 or parts[0].lower() != "setconf":
         await context.bot.send_message(
             chat_id=chat_id,
-            text="Invalid command format.\nExample: `setconf ser=4.5`",
+            text=f"Invalid command format.\nExample: `setconf ser=4.5`\n {text}",
             parse_mode='Markdown'
         )
         return
@@ -538,6 +538,7 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
         value = get_price_buyer(key)
         if value is None:
             await context.bot.send_message(chat_id=chat_id, text="error change value. file read error")
+            return None
         value += sign*0.1
 
         if value > mmax:
@@ -548,9 +549,10 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
         await set_conf_buyer(chat_id, context, f"key={value}")
 
     if worker:
-        value = get_price_buyer(key)
+        value = get_price_worker(key)
         if value is None:
             await context.bot.send_message(chat_id=chat_id, text="error change value. file read error")
+            return None
         value += sign*0.1
 
         if value > mmax:
