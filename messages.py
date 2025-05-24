@@ -482,7 +482,7 @@ def get_price_worker(short_key):
         apples = data.get("apples", [])
         for item in apples:
             if item.get("name") == short_key:
-                return item.get("cost")
+                return item.get("cost")/1_000_000
         return None
     except (FileNotFoundError, json.JSONDecodeError):
         return None
@@ -494,7 +494,7 @@ def get_price_buyer(key):
         full_key = short_to_full[key]
         with open(fn, "r", encoding="utf-8") as f:
             data = json.load(f)
-        return data.get("autobuy", {}).get(full_key, {}).get("buyPrice")
+        return data.get("autobuy", {}).get(full_key, {}).get("buyPrice")/1_000_000
     except Exception as e:
         return None
 
@@ -634,7 +634,8 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
         await asyncio.sleep(0.5)
 
 async def make_money(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
-    
+    if config.mode == config.mode_buyer:
+        return
     money = config.log_dir + "/money.png"
 
     with open(money, 'rb') as photo:
