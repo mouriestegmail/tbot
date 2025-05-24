@@ -65,8 +65,8 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_message.chat_id
     global flag_alarm
 
-    if chat_id not in config.users:
-        return
+    # if chat_id not in config.users:
+    #     return
     text = update.message.text.lower()
 
     await context.bot.send_message(chat_id=chat_id, text=get_last_commit_message())
@@ -120,6 +120,8 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif "history" in text:
         await make_history(chat_id, context)
     else:
+        if chat_id not in config.users:
+            return
         text = """ss    - shot from workers [ss w1]
 get   - get file      [get w1.ah]
 file  - get tree of files 
