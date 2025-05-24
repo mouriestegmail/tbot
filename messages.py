@@ -178,7 +178,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     f_list = []
     for i in range(1, workers):
-        f_list.append(dir + f'\\A{i}.ah')
+        f_list.append(l_dir + f'\\A{i}.ah')
 
     s_f = l_dir + f'\\storage.ah'
     f_list.append(s_f)
@@ -538,8 +538,8 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
         await asyncio.sleep(0.5)
 
 async def make_money(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
-    global log_dir
-    money = log_dir + "/money.png"
+    
+    money = config.log_dir + "/money.png"
 
     with open(money, 'rb') as photo:
         await context.bot.send_photo(chat_id=chat_id, photo=photo)

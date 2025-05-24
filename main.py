@@ -151,7 +151,7 @@ def main() -> None:
     observer.start()
 
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    app.run_polling()
 
 
 
