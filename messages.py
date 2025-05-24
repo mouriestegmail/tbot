@@ -227,16 +227,6 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
         except Exception as e:
             text += "\n err"
     text += create_inventory_log()
-    text += "\n"
-    filename = l_dir + f'\\money.txt'
-    with open(filename, 'r') as file:
-        modification_time = os.path.getmtime(filename)
-        modification_datetime = datetime.fromtimestamp(modification_time)
-        current_datetime = datetime.now()
-        time_difference = current_datetime - modification_datetime
-        minutes_passed = time_difference.total_seconds() // 6 / 10
-
-        text += "".join(list(file.readlines())) + "    " + str(minutes_passed) + "m"
 
     text = format_text(text)
     text = text.replace(" z:", "  ")
@@ -246,7 +236,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     total, used, free = shutil.disk_usage("C:\\")
 
     await context.bot.send_message(chat_id=chat_id, text=f"free space: {free // (2 ** 30)} GB")
-    make_money(chat_id, )
+    
 
 async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
@@ -548,37 +538,10 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
         await asyncio.sleep(0.5)
 
 async def make_money(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
-    l_dir = config.log_dir
-    dir_ss = l_dir + "\\ss"
-    crop_file = l_dir + "/cropped_money.png"
+    global log_dir
+    money = log_dir + "/money.png"
 
-    money = "money.png"
-    name = "storage"
-
-    fns = get_all_files(name, dir_ss)
-    print(fns)
-
-    latest_file = max(fns, key=os.path.getmtime)
-
-    print(latest_file)
-    try:
-        dir_path = os.path.dirname(latest_file)
-        print(dir_path)  # /some/long/path/to
-    except Exception as e:
-        print(e)
-
-    latest_file = dir_path + "/money.png"
-
-    print(latest_file)
-
-    img = Image.open(latest_file)
-
-    crop_box = (110, 370, 80 + 150, 360 + 100)
-    cropped_img = img.crop(crop_box)
-
-    cropped_img.save(crop_file)
-
-    with open(crop_file, 'rb') as photo:
+    with open(money, 'rb') as photo:
         await context.bot.send_photo(chat_id=chat_id, photo=photo)
         await asyncio.sleep(0.5)
 
