@@ -533,10 +533,11 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
     mmax = config.cost[key][1]
     mmin = config.cost[key][0]
 
+
     if not buyer and not worker:
         await context.bot.send_message(chat_id=chat_id, text="error change value. bad who?")
 
-    if buyer:
+    if buyer and config.mode == config.mode_buyer:
         value = get_price_buyer(key)
         if value is None:
             await context.bot.send_message(chat_id=chat_id, text="error change value. file read error")
@@ -550,7 +551,7 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
 
         await set_conf_buyer(chat_id, context, f"setconf key={value}")
 
-    if worker:
+    if worker and config.mode == config.mode_worker:
         value = get_price_worker(key)
         if value is None:
             await context.bot.send_message(chat_id=chat_id, text="error change value. file read error")
