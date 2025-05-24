@@ -528,6 +528,8 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
     if "b" in ll[0]:
         buyer = True
 
+    print(f"{worker} {buyer} {ll[0]}")
+
     mmax = config.cost[key][1]
     mmin = config.cost[key][0]
 
@@ -546,7 +548,7 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
         if value < mmin:
             value = mmax
 
-        await set_conf_buyer(chat_id, context, f"key={value}")
+        await set_conf_buyer(chat_id, context, f"setconf key={value}")
 
     if worker:
         value = get_price_worker(key)
@@ -560,7 +562,7 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
         if value < mmin:
             value = mmax
 
-        await set_conf(chat_id, context, f"key={value}")
+        await set_conf(chat_id, context, f"setconf key={value}")
 
     return None
 
