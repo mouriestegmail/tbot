@@ -3,77 +3,21 @@ from messages import *
 from telegram.ext import ContextTypes, MessageHandler, filters
 from telegram.ext import Application
 from telegram import Update
-import configparser
 import subprocess
 import sys
 import asyncio
+import config
+import file_handler
 
 
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-from pathlib import Path
+
 
 
 set_folders_prison = set()
 set_folders_except = set()
 
-martin = 799070257
-andrei = 124768943
-users = [andrei, martin]
 
-mode_worker = ""
-mode_buyer = "_buyer"
-mode_dev= "_dev"
-
-mode = mode_worker
-
-
-
-def read_config(arg):
-    global mode
-    if arg == "-b":
-        mode = mode_buyer
-    if arg == "-d":
-        mode = mode_dev
-
-    sect = "general"
-    config = configparser.ConfigParser()
-    fn = "./config" + mode + ".ini"
-    res = config.read(fn)
-
-    if len(res) == 0:
-        print(f"check {fn} file")
-        exit(-1)
-
-    sections = config.sections()
-
-    if sect not in sections:
-        print(f"no section in config file. section = {sect}")
-        print(sections)
-        exit(-1)
-
-    s_log_dir = "log_dir"
-    s_prison_dir = "prison_dir"
-    s_commands_dir = "commands_dir"
-    s_except_dir = "except_dir"
-    s_token = "token"
-    s_config_json = "config_json"
-
-    print(s_log_dir)
-    for i in s_log_dir, s_prison_dir, s_commands_dir, s_except_dir, s_token, s_config_json:
-        if i not in config[sect]:
-            print(f"check {fn} file: {i}")
-            exit(-1)
-
-    messages.log_dir = config[sect][s_log_dir]
-    messages.prison_dir = config[sect][s_prison_dir]
-    messages.commands_dir = config[sect][s_commands_dir]
-    messages.except_dir = config[sect][s_except_dir]
-    messages.token = config[sect][s_token]
-    messages.config_json = config[sect][s_config_json]
-
-    print(log_dir, prison_dir, commands_dir, except_dir, token, sep="\n")
-    print(messages.log_dir)
 
 def get_last_commit_message() -> str:
     result = subprocess.run(
@@ -121,14 +65,14 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_message.chat_id
     global flag_alarm
 
-    if chat_id not in users:
+    if chat_id not in config.users:
         return
     text = update.message.text.lower()
 
     await context.bot.send_message(chat_id=chat_id, text=get_last_commit_message())
 
-    if chat_id == martin:
-        await context.bot.send_message(chat_id=andrei, text=f"Martin say: {text}")
+    if chat_id == config.martin:
+        await context.bot.send_message(chat_id=config.andrei, text=f"Martin say: {text}")
 
     if "ss" in text:
         await make_ss(chat_id, context, text=text)
@@ -161,12 +105,12 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await make_money(chat_id, context)
         await make_sum(chat_id, context)
     elif "setconf" in text:
-        if mode == mode_worker:
+        if config.mode == config.mode_worker:
             await set_conf(chat_id, context, text)
         else:
             await set_conf_buyer(chat_id, context, text)
     elif "conf" in text:
-        if mode == mode_worker:
+        if config.mode == config.mode_worker:
             await make_conf(chat_id, context)
         else:
             await make_conf_buyer(chat_id, context)
@@ -186,7 +130,7 @@ sum   - summary
 history - 14 day history
         """
         text = "```help\n" + text + "\n```"
-        await context.bot.send_message(chat_id=andrei, text=text, parse_mode='Markdown')
+        await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 def main() -> None:
 
@@ -197,12 +141,12 @@ def main() -> None:
     # content = os.listdir(messages.except_dir)
     # set_folders_except = set([folder for folder in content if os.path.isfile(os.path.join(messages.except_dir, folder))])
 
-    app = Application.builder().token(messages.token).build()
+    app = Application.builder().token(config.token).build()
 
     loop = asyncio.get_event_loop()
     observer = Observer()
-    observer.schedule(NewFileHandler(app.bot, loop),
-                      path="/home/andreysokolov/project/minecraft/share/capcha",
+    observer.schedule(file_handler.NewFileHandler(app.bot, loop),
+                      path=config.watch_dir,
                       recursive=False)
     observer.start()
 
@@ -210,36 +154,28 @@ def main() -> None:
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
-class NewFileHandler(FileSystemEventHandler):
-    def __init__(self, bot, loop):
-        self.bot = bot
-        self.loop = loop  # loop Telegram Application'а
 
-    def on_created(self, event):
-        if not event.is_directory:
-            asyncio.run_coroutine_threadsafe(
-                self.notify(event.src_path),
-                self.loop
-            )
-
-    async def notify(self, filepath):
-        filename = Path(filepath).name
-        if filename.startswith(".#"):
-            return  # игнорировать временные файлы
-
-        print("file")
-        await self.bot.send_message(chat_id=andrei, text=f"Появился файл: {filename}")
 
 
 if __name__ == "__main__":
     arg = ""
     if len(sys.argv) == 2:
         arg = sys.argv[1]
-        if arg == '-b' or  arg == '-d':
+        if arg in ['-b', '-d', '-m']:
             pass
         else:
-            print(f'undefine arg {arg}. use "-b" or "-d" or empty ')
+            print(f'undefine arg {arg}. use "-b", "-d", "-m" or empty ')
             exit(-1)
     print(arg)
-    read_config(arg)
+    config.read_config(arg)
+
+    print(config.log_dir,
+          config.prison_dir,
+          config.commands_dir,
+          config.except_dir,
+          config.token,
+          config.config_json,
+          config.watch_dir,
+
+          sep="\n")
     main()

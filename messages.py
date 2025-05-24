@@ -6,18 +6,13 @@ from datetime import datetime
 import time
 import pathlib
 import os
+import config
 
 import pyautogui
 from PIL import Image
 from telegram.ext import ContextTypes
 
 
-log_dir = ""
-prison_dir = ""
-commands_dir = ""
-except_dir = ""
-token = ""
-config_json = ""
 
 short_to_full = {
     "kil": "Зелье Киллера",
@@ -84,7 +79,7 @@ async def create_command(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -
     if len(l) != 2 or "comm" not in l[0]:
         await context.bot.send_message(chat_id=chat_id, text="bad command")
         return
-    fn = commands_dir + f'\\{l[1]}'
+    fn = config.commands_dir + f'\\{l[1]}'
 
     print(fn)
 
@@ -97,7 +92,7 @@ async def create_command(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -
         await context.bot.send_message(chat_id=chat_id, text=f"command already exist")
 
 async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
-    global log_dir
+    l_dir = config.log_dir
     from datetime import datetime, timedelta
 
     print("make_history")
@@ -113,7 +108,7 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         for i in range(1, workers):
             try:
-                filename = log_dir + f'\\{current_time.strftime("%d.%m.%Y")}_A{i}.sold'
+                filename = l_dir + f'\\{current_time.strftime("%d.%m.%Y")}_A{i}.sold'
 
                 with open(filename, 'r') as file:
                     first_line = file.readline().strip()
@@ -135,9 +130,9 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 def create_inventory_log() -> str:
-    global log_dir
+    l_dir = config.log_dir
 
-    fn = log_dir + f'/inventory.ah'
+    fn = l_dir + f'/inventory.ah'
     try:
         with open(fn, 'r') as file:
             first_line = file.readline().strip()
@@ -151,7 +146,7 @@ def create_inventory_log() -> str:
     return "\nNo data"
 
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
-    global log_dir
+    l_dir = config.log_dir
     current_time = datetime.now()
     text = "sold:"
     print("make_sum")
@@ -160,7 +155,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     for i in range(1, workers):
         try:
-            filename = log_dir + f'\\{current_time.strftime("%d.%m.%Y")}_A{i}.sold'
+            filename = l_dir + f'\\{current_time.strftime("%d.%m.%Y")}_A{i}.sold'
 
             with open(filename, 'r') as file:
                 first_line = file.readline().strip()
@@ -183,9 +178,9 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     f_list = []
     for i in range(1, workers):
-        f_list.append(log_dir + f'\\A{i}.ah')
+        f_list.append(dir + f'\\A{i}.ah')
 
-    s_f = log_dir + f'\\storage.ah'
+    s_f = l_dir + f'\\storage.ah'
     f_list.append(s_f)
     ss = 0
     sum_dict = dict()
@@ -233,7 +228,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
             text += "\n err"
     text += create_inventory_log()
     text += "\n"
-    filename = log_dir + f'\\money.txt'
+    filename = l_dir + f'\\money.txt'
     with open(filename, 'r') as file:
         modification_time = os.path.getmtime(filename)
         modification_datetime = datetime.fromtimestamp(modification_time)
@@ -254,8 +249,8 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     make_money(chat_id, )
 
 async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
-    global prison_dir
-    fn = config_json
+
+    fn = config.config_json
 
     print(fn)
 
@@ -276,7 +271,7 @@ async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 async def make_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
-    fn = config_json
+    fn = config.config_json
 
     # Проверка существования файла
     if not os.path.isfile(fn):
@@ -314,7 +309,7 @@ async def make_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     await context.bot.send_message(chat_id=chat_id, text="\n".join(lines), parse_mode='Markdown')
 
 async def set_conf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
-    global prison_dir
+    prison_dir = config.prison_dir
     fn = prison_dir + f'\\config.json'
     l = text.split(" ")
     print(fn, text)
@@ -407,7 +402,7 @@ async def set_conf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None
             os.remove(temp_filename)
 
 async def set_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
-    fn = config_json  # path to autobuy.json
+    fn = config.config_json  # path to autobuy.json
 
     parts = text.strip().split()
 
@@ -490,14 +485,14 @@ async def set_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -
 
 
 async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=30, full=False) -> None:
-    global log_dir
+    l_dir = config.log_dir
     current_time = datetime.now()
-    filename = log_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
+    filename = l_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
     print(filename)
 
     if not full:
         current_time = datetime.now()
-        filename = log_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
+        filename = l_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
         print(filename)
         try:
             with open(filename, 'r') as file:
@@ -511,11 +506,11 @@ async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=30, full=F
             await context.bot.send_document(chat_id=chat_id, document=text_file, filename='full.log')
 
 async def make_get_file(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
-    global log_dir
+    l_dir = config.log_dir
 
     fn = text.replace("get", "").replace(" ", "")
 
-    filename = log_dir + f'/{fn}'
+    filename = l_dir + f'/{fn}'
     name = fn.split("/")[-1]
     print(filename)
     try:
@@ -526,9 +521,9 @@ async def make_get_file(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> No
         await context.bot.send_message(chat_id=chat_id, text=f'err {e}')
 
 async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
-    global log_dir
+    l_dir = config.log_dir
 
-    dir_ss = log_dir + "\\ss"
+    dir_ss = l_dir + "\\ss"
 
     if not os.path.exists(dir_ss):
         await context.bot.send_message(chat_id=chat_id, text=f'[{dir_ss}] not exist')
@@ -553,9 +548,9 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
         await asyncio.sleep(0.5)
 
 async def make_money(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
-    global log_dir
-    dir_ss = log_dir + "\\ss"
-    crop_file = log_dir + "/cropped_money.png"
+    l_dir = config.log_dir
+    dir_ss = l_dir + "\\ss"
+    crop_file = l_dir + "/cropped_money.png"
 
     money = "money.png"
     name = "storage"
@@ -605,8 +600,8 @@ import asyncio
 from telegram.ext import ContextTypes
 
 async def make_fn(chat_id, context: ContextTypes.DEFAULT_TYPE, text):
-    global log_dir
-    dir_ss = os.path.join(log_dir, "ss")
+    l_dir = config.log_dir
+    dir_ss = os.path.join(l_dir, "ss")
 
     name = text.replace("fn", "").replace(" ", "")
     fns = get_all_files(name, dir_ss)
@@ -635,8 +630,8 @@ async def make_fn(chat_id, context: ContextTypes.DEFAULT_TYPE, text):
 
 
 async def make_time(chat_id, context: ContextTypes.DEFAULT_TYPE):
-    global log_dir
-    dir_ss = log_dir
+    l_dir = config.log_dir
+    dir_ss = l_dir
 
     text = "```time\n"
 
@@ -657,7 +652,7 @@ async def make_time(chat_id, context: ContextTypes.DEFAULT_TYPE):
             print(e)
             text += f'{name}: err \n'
 
-    filename = log_dir + f'/money.txt'
+    filename = l_dir + f'/money.txt'
     with open(filename, 'r') as file:
         text += "".join(list(file.readlines()))
     text += "```"

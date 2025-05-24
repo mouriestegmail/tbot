@@ -37,7 +37,8 @@ reply_keyboard = [
 
 martin = 799070257
 andrei = 124768943
-users = [andrei, martin]
+bot_connect_group = -4982847677
+users = [andrei, martin, bot_connect_group]
 
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
@@ -101,11 +102,12 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_message.chat_id
     global flag_alarm
 
-    if chat_id not in users:
-        return
+    # if chat_id not in users:
+    #     return
     text = update.message.text.lower()
 
-    print(f"new message: {text}")
+    chat_title = update.effective_chat.title
+    print(f"[GROUP] chat_id: {chat_id}, title: {chat_title}, message: {text}")
 
     await context.bot.send_message(chat_id=chat_id, text=get_last_commit_message())
 
@@ -134,7 +136,7 @@ def main() -> None:
     observer.start()
 
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    app.run_polling()
 
 
 class NewFileHandler(FileSystemEventHandler):
