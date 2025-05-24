@@ -260,6 +260,7 @@ async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = "```conf\n" + text + "\n```"
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
+
 async def make_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     fn = config.config_json
 
@@ -472,6 +473,94 @@ async def set_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -
             shutil.copyfile(backup_fn, fn)
         if os.path.exists(temp_fn):
             os.remove(temp_fn)
+
+def get_price_worker(short_key):
+    try:
+        fn = config.config_json
+        with open(fn, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        apples = data.get("apples", [])
+        for item in apples:
+            if item.get("name") == short_key:
+                return item.get("cost")
+        return None
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+
+def get_price_buyer(key):
+
+    try:
+        fn = config.config_json
+        full_key = short_to_full[key]
+        with open(fn, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data.get("autobuy", {}).get(full_key, {}).get("buyPrice")
+    except Exception as e:
+        return None
+
+async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_key, plus_or_minus"):
+    buyer = False
+    worker = False
+    sign = 1
+    key = ""
+    sep = "++"
+    diff = 0.1
+
+    if "--" in "text":
+        sign = -1
+        sep = "--"
+    ll = text.split(sep)
+    if len(ll) != 2:
+        await context.bot.send_message(chat_id=chat_id, text = "error change value. bad input")
+        return None
+    key = ll[1]
+    if key not in short_to_full.keys():
+        await context.bot.send_message(chat_id=chat_id, text="error change value. bad key")
+        return None
+
+    if key not in config.cost:
+        await context.bot.send_message(chat_id=chat_id,
+                                       text=f"error change value. bad key cost: {config.cost.keys()}")
+
+
+    if "w" in ll[0]:
+        worker = True
+    if "b" in ll[0]:
+        buyer = True
+
+    mmax = config.cost[key][1]
+    mmin = config.cost[key][0]
+
+    if not buyer and not worker:
+        await context.bot.send_message(chat_id=chat_id, text="error change value. bad who?")
+
+    if buyer:
+        value = get_price_buyer(key)
+        if value is None:
+            await context.bot.send_message(chat_id=chat_id, text="error change value. file read error")
+        value += sign*0.1
+
+        if value > mmax:
+            value = mmax
+        if value < mmin:
+            value = mmax
+
+        await set_conf_buyer(chat_id, context, f"key={value}")
+
+    if worker:
+        value = get_price_buyer(key)
+        if value is None:
+            await context.bot.send_message(chat_id=chat_id, text="error change value. file read error")
+        value += sign*0.1
+
+        if value > mmax:
+            value = mmax
+        if value < mmin:
+            value = mmax
+
+        await set_conf(chat_id, context, f"key={value}")
+
+    return None
 
 
 async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, count=30, full=False) -> None:

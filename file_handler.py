@@ -23,14 +23,15 @@ class NewFileHandler(FileSystemEventHandler):
             )
 
     async def notify(self, filepath):
-        filename = Path(filepath).name
-        if filename.startswith(".#"):
+        name = Path(filepath).name
+        if name.startswith(".#"):
             return  # игнорировать временные файлы
-        if self.is_time_file(filename):
+        if self.is_time_file(filepath):
             await self.handler_time()
-            os.remove(filename)
+            if os.path.isfile(filepath):
+                os.remove(filepath)
         else:
-            await self.bot.send_message(chat_id=config.bot_connect_group, text=f"Появился файл: {filename}")
+            await self.bot.send_message(chat_id=config.bot_connect_group, text=f"Появился файл: {name}")
 
     def is_time_file(self, file):
         return "time" in file
