@@ -542,13 +542,14 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
         if value is None:
             await context.bot.send_message(chat_id=chat_id, text="error change value. file read error")
             return None
+        print(f"value = {value}")
         value += sign*0.1
-
+        print(f"value = {value}")
         if value > mmax:
             value = mmax
         if value < mmin:
-            value = mmax
-
+            value = mmin
+        print(f"value = {value}")
         await set_conf_buyer(chat_id, context, f"setconf {key}={value}")
 
     if worker and config.mode == config.mode_worker:
@@ -556,13 +557,14 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
         if value is None:
             await context.bot.send_message(chat_id=chat_id, text="error change value. file read error")
             return None
+        print(f"value = {value}")
         value += sign*0.1
-
+        print(f"value = {value}")
         if value > mmax:
             value = mmax
         if value < mmin:
-            value = mmax
-
+            value = mmin
+        print(f"value = {value}")
         await set_conf(chat_id, context, f"setconf {key}={value}")
 
     return None
