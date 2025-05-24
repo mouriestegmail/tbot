@@ -506,7 +506,7 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
     sep = "++"
     diff = 0.1
 
-    if "--" in "text":
+    if "--" in text:
         sign = -1
         sep = "--"
     ll = text.split(sep)
