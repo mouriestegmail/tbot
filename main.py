@@ -76,6 +76,8 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     if "ss" in text:
         await make_ss(chat_id, context, text=text)
+    elif "--" in text or "++" in text:
+        await change_value(chat_id, context, text=text)
     elif "get" in text:
         await make_get_file(chat_id=chat_id, context=context, text=text)
     elif "file" in text:
