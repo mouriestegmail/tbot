@@ -50,10 +50,14 @@ class NewFileHandler(FileSystemEventHandler):
             value += i_apples.get(key,0)
 
             if value < 10:
+                print(f"wb++{key}")
                 await self.bot.send_message(chat_id=config.bot_connect_group, text=f"wb++{key}")
-            elif value > 30:
+            if value > 40:
+                print(f"b--{key}")
                 await self.bot.send_message(chat_id=config.bot_connect_group, text=f"b--{key}")
-            elif value > 50:
+
+            if value > 70:
+                print(f"wb--{key}")
                 await self.bot.send_message(chat_id=config.bot_connect_group, text=f"wb--{key}")
 
             sleep(1)
