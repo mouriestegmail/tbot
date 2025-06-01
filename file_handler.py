@@ -30,11 +30,16 @@ class NewFileHandler(FileSystemEventHandler):
             await self.handler_time()
             if os.path.isfile(filepath):
                 os.remove(filepath)
+        elif self.is_err_file(filepath):
+            await self.bot.send_message(chat_id=config.martin, text=f"{name}")
+            await self.bot.send_message(chat_id=config.andrei, text=f"{name}")
         else:
             await self.bot.send_message(chat_id=config.bot_connect_group, text=f"Появился файл: {name}")
 
     def is_time_file(self, file):
         return "time" in file
+    def is_err_file(self, file):
+        return "err" in file
 
     async def handler_time(self):
         watched_key = ["med", "pob"]
