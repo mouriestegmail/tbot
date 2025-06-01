@@ -22,7 +22,7 @@ short_to_full = {
     "ser": "Серная кислота",
 }
 
-workers = 7 + 1
+workers = ["A1","B1","A2","B2", "A3", "B3", "A4", "B4"]
 
 def split_text_into_chunks(text: str, lines_per_chunk: int = 30) -> list:
     lines = text.splitlines()
@@ -106,9 +106,9 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         all_a = eval("{'agt':0, 'kil':0, 'med':0,'pob':0,'ser':0}")
 
-        for i in range(1, workers):
+        for i in workers:
             try:
-                filename = l_dir + f'\\{current_time.strftime("%d.%m.%Y")}_A{i}.sold'
+                filename = l_dir + f'\\{current_time.strftime("%d.%m.%Y")}_{i}.sold'
 
                 with open(filename, 'r') as file:
                     first_line = file.readline().strip()
@@ -153,9 +153,9 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     ss = 0
     all_a = eval("{'agt':0, 'med':0, 'kil':0, 'pob':0,'ser':0}")
 
-    for i in range(1, workers):
+    for i in workers:
         try:
-            filename = l_dir + f'\\{current_time.strftime("%d.%m.%Y")}_A{i}.sold'
+            filename = l_dir + f'\\{current_time.strftime("%d.%m.%Y")}_{i}.sold'
 
             with open(filename, 'r') as file:
                 first_line = file.readline().strip()
@@ -177,8 +177,8 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
              f'\n{str(all_a).replace(" ", "")}  {ss}\nAH:')
 
     f_list = []
-    for i in range(1, workers):
-        f_list.append(l_dir + f'\\A{i}.ah')
+    for i in workers:
+        f_list.append(l_dir + f'\\{i}.ah')
 
     s_f = l_dir + f'\\storage.ah'
     f_list.append(s_f)
@@ -695,8 +695,8 @@ async def make_time(chat_id, context: ContextTypes.DEFAULT_TYPE):
 
     text = "```time\n"
 
-    for i in range(1, workers):
-        name = f"A{i}"
+    for i in workers:
+        name = i
         fn = f'{dir_ss}/{name}.time'
 
         try:
