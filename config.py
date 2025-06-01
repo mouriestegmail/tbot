@@ -21,6 +21,14 @@ mode_mac = "_mac"
 
 mode = mode_worker
 
+short_to_full = {
+    "kil": "Зелье Киллера",
+    "pob": "Зелье Победителя",
+    "med": "Зелье Медика",
+    "agt": "Зелье Агента",
+    "ser": "Серная кислота",
+}
+
 def read_config(arg):
     global log_dir, prison_dir, commands_dir, except_dir, token, config_json, watch_dir, mode
 
@@ -35,6 +43,8 @@ def read_config(arg):
     config = configparser.ConfigParser()
     fn = "./config" + mode + ".ini"
     res = config.read(fn)
+
+    print(fn)
 
     if len(res) == 0:
         print(f"check {fn} file")

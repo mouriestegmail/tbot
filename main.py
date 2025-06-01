@@ -1,185 +1,55 @@
-import messages
-from messages import *
-from telegram.ext import ContextTypes, MessageHandler, filters
-from telegram.ext import Application
-from telegram import Update
-import subprocess
 import sys
-import asyncio
+
+import logging
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, filters
 import config
 import file_handler
-
-
+import handlers_buttons
+from handlers_buttons import start, echo, handle_callback
+from telegram.ext import Application
+import asyncio
 from watchdog.observers import Observer
 
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
 
-
-set_folders_prison = set()
-set_folders_except = set()
-
-
-
-def get_last_commit_message() -> str:
-    result = subprocess.run(
-        ['git', 'log', '-1', '--pretty=%h [%cd]', '--date=format:%Y-%m-%d %H:%M:%S'],
-        capture_output=True,
-        text=True
-    )
-    return result.stdout.strip()
-
-def files_tree() -> str:
-    global log_dir
-    start_dir = os.path.expanduser(log_dir)
-    def build_tree(dir_path: str, prefix: str = "") -> str:
-        tree_str = ""
-        entries = sorted(os.listdir(dir_path))  # Сортируем файлы и каталоги по имени
-        total_entries = len(entries)
-
-        for index, entry in enumerate(entries):
-            path = os.path.join(dir_path, entry)
-            is_last = index == total_entries - 1
-
-            # Добавляем текущий элемент к дереву
-            tree_str += prefix + ("└── " if is_last else "├── ") + entry + "\n"
-
-            # Если это директория, рекурсивно строим дерево
-            if os.path.isdir(path):
-                new_prefix = prefix + ("    " if is_last else "│   ")
-                tree_str += build_tree(path, new_prefix)
-
-        return tree_str
-
-    return build_tree(start_dir).rstrip()
-
-async def make_files(chat_id, context:ContextTypes.DEFAULT_TYPE):
-    text = files_tree()
-
-    chunks = split_text_into_chunks(text)
-
-    for item in chunks:
-        text = "```\n" + item + "```"
-        await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
-        await asyncio.sleep(0.2)
-
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    chat_id = update.effective_message.chat_id
-    global flag_alarm
-
-    # if chat_id not in config.users:
-    #     return
-    text = update.message.text.lower()
-
-    await context.bot.send_message(chat_id=chat_id, text=get_last_commit_message())
-
-    if chat_id == config.martin:
-        await context.bot.send_message(chat_id=config.andrei, text=f"Martin say: {text}")
-
-    if "ss" in text:
-        await make_ss(chat_id, context, text=text)
-    elif "--" in text or "++" in text:
-        await change_value(chat_id, context, text=text)
-    elif "get" in text:
-        await make_get_file(chat_id=chat_id, context=context, text=text)
-    elif "file" in text:
-        await make_files(chat_id, context)
-    elif "fn" in text:
-        await make_fn(chat_id, context, text=text)
-    elif "time" in text:
-        await make_time(chat_id, context)
-    elif "fshot" in text:
-        await make_screenshot(chat_id, context, full=True)
-    elif "shot" in text:
-        await make_screenshot(chat_id, context)
-    elif "full" in text or "flog" in text:
-        await make_log(chat_id, context, full=True)
-    elif "log" in text:
-        integer_value = 5
-        try:
-            integer_value = int(''.join(re.findall(r'\d+', text)))
-        except ValueError:
-            pass
-        await make_log(chat_id, context, count=integer_value)
-    elif "comm" in text:
-        print(text)
-        await create_command(chat_id, context, text)
-    elif "sum" in text:
-        # await make_log(chat_id, context, count=5)
-        await make_money(chat_id, context)
-        await make_sum(chat_id, context)
-    elif "setconf" in text:
-        if config.mode == config.mode_worker:
-            await set_conf(chat_id, context, text)
-        else:
-            await set_conf_buyer(chat_id, context, text)
-    elif "conf" in text:
-        if config.mode == config.mode_worker:
-            await make_conf(chat_id, context)
-        else:
-            await make_conf_buyer(chat_id, context)
-
-    elif "history" in text:
-        await make_history(chat_id, context)
-    else:
-        if chat_id not in config.users:
-            return
-        text = """ss    - shot from workers [ss w1]
-get   - get file      [get w1.ah]
-file  - get tree of files 
-fn    - screenshot name   [fn ah]
-time  - last ah update 
-full  - get curr file log
-log   - log               [log30]
-comm  - create command [comm buy]
-sum   - summary
-history - 14 day history
-        """
-        text = "```help\n" + text + "\n```"
-        await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
-
-def main() -> None:
-
-
-    # content = os.listdir(messages.prison_dir)
-    # set_folders_prison = set([folder for folder in content if os.path.isdir(os.path.join(messages.prison_dir, folder))])
-    #
-    # content = os.listdir(messages.except_dir)
-    # set_folders_except = set([folder for folder in content if os.path.isfile(os.path.join(messages.except_dir, folder))])
-
+def main():
+    print(f"Using token: {config.token}")
     app = Application.builder().token(config.token).build()
 
     loop = asyncio.get_event_loop()
+
+    event_handler = file_handler.NewFileHandler(app.bot, loop)
+
     observer = Observer()
-    observer.schedule(file_handler.NewFileHandler(app.bot, loop),
-                      path=config.watch_dir,
-                      recursive=False)
+    observer.schedule(event_handler, path=config.watch_dir, recursive=False)
     observer.start()
 
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    app.add_handler(CommandHandler("start", handlers_buttons.start))
+
+    # Добавляем обработчик для кнопок (callback_query)
+    app.add_handler(CallbackQueryHandler(handlers_buttons.handle_callback))
+
+    # Добавляем обработчик текстовых сообщений (эхо и команды из текста)
+    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handlers_buttons.echo))
+
+
     app.run_polling()
 
-
-
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     arg = ""
     if len(sys.argv) == 2:
         arg = sys.argv[1]
-        if arg in ['-b', '-d', '-m']:
+        if arg == '-b':
+            pass
+        elif arg == '-d':
+            pass
+        elif arg == '-m':
             pass
         else:
-            print(f'undefine arg {arg}. use "-b", "-d", "-m" or empty ')
+            print(f'undefine arg {arg}. use "-b" or "-d" or empty ')
             exit(-1)
-    print(arg)
+
     config.read_config(arg)
-
-    print(config.log_dir,
-          config.prison_dir,
-          config.commands_dir,
-          config.except_dir,
-          config.token,
-          config.config_json,
-          config.watch_dir,
-
-          sep="\n")
     main()
