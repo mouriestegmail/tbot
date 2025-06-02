@@ -148,14 +148,16 @@ def create_inventory_log() -> str:
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     l_dir = config.log_dir
     current_time = datetime.now()
-    text = "sold:"
+    text = "sold:\n{"
     print("make_sum")
     ss = 0
     all_a = eval("{'agt':0, 'med':0, 'kil':0, 'pob':0,'ser':0}")
-
-    for i in workers:
+    ttt = ""
+    for name in workers:
         try:
-            filename = l_dir + f'\\{current_time.strftime("%d.%m.%Y")}_{i}.sold'
+            filename = l_dir + f'\\{current_time.strftime("%d.%m.%Y")}_{name}.sold'
+
+
 
             with open(filename, 'r') as file:
                 first_line = file.readline().strip()
@@ -167,12 +169,16 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                     s += v
                     all_a[k] += v
                 ss += s
-                # text += "\n" + str(apples)
+
                 if first_line:
-                    text += "\n" + str(apples).replace(" ", "") + f' {s}'
+                    if ttt != "":
+                        ttt += ", "
+                    ttt += f'{s}'
+
         except Exception as e:
             print(e)
-            text += "\n err"
+            ttt += ", E"
+    text += ttt + " }"
     text += (f"\nsumm:"
              f'\n{str(all_a).replace(" ", "")}  {ss}\nAH:')
 
