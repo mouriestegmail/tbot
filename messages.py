@@ -228,7 +228,12 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                             for key in list(apples):
                                 if apples[key] == 0:
                                     del apples[key]
-                            text += "\n" + str(apples).replace(" ", "").replace(": ", ":").replace("-","?") + f' {s}'
+                            t = str(apples).replace(" ", "")
+                            t = t.replace(": ", ":")
+                            t = t.replace("-","?")
+                            t = t.replace("_M_","*")
+
+                            text += "\n" + t + f' {s}'
                         else:
                             t = delta_t_real // 6 / 10
                             text += f"\ntimeout : {t}"
