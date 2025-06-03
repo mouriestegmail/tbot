@@ -22,7 +22,11 @@ short_to_full = {
     "ser": "Серная кислота",
 }
 
-workers = ["A1","B1","A2","B2", "A3", "B3", "A4", "B4"]
+workers = ["A1","B1",
+           "A2","B2", 
+           "A3", "B3", 
+           "A4", "B4", 
+           "A5", "B5"]
 
 def split_text_into_chunks(text: str, lines_per_chunk: int = 30) -> list:
     lines = text.splitlines()
@@ -148,7 +152,7 @@ def create_inventory_log() -> str:
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     l_dir = config.log_dir
     current_time = datetime.now()
-    text = "sold:\n{"
+    text = "ПРОДАНО:\n{"
     print("make_sum")
     ss = 0
     all_a = eval("{'agt':0, 'med':0, 'kil':0, 'pob':0,'ser':0}")
@@ -156,8 +160,6 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     for name in workers:
         try:
             filename = l_dir + f'\\{current_time.strftime("%d.%m.%Y")}_{name}.sold'
-
-
 
             with open(filename, 'r') as file:
                 first_line = file.readline().strip()
@@ -171,16 +173,14 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                 ss += s
 
                 if first_line:
-                    if ttt != "":
-                        ttt += ", "
-                    ttt += f'{s}'
+                    ttt += f'{s} '
 
         except Exception as e:
             print(e)
-            ttt += ", E"
+            ttt += "0 "
     text += ttt + " }"
-    text += (f"\nsumm:"
-             f'\n{str(all_a).replace(" ", "")}  {ss}\nAH:')
+    text += (f"\nВСЕГО ПРОДАНО:"
+             f'\n{str(all_a).replace(" ", "")}  {ss}\nНА АУКЦИОНЕ:')
 
     f_list = []
     for i in workers:
@@ -201,7 +201,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                     s = 0
                     if first_line:
                         if filename == s_f:
-                            text += "\nsumm:\n" + str(sum_dict).replace(" ", "") + f' {ss}' + "\nstorage:\n"
+                            text += "\nВСЕГО НА АУКЦИОНЕ:\n" + str(sum_dict).replace(" ", "") + f' {ss}' + "\nВ ХРАНИЛИЩЕ:\n"
                         ah_max = "?"
 
                         last_modified_time = os.path.getmtime(filename)

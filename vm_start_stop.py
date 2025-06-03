@@ -1,7 +1,7 @@
 import subprocess
 import time
 import logging
-# import wmi
+import wmi
 
 vm_list = [
     "C:\\VMs\\vm1.vmx",
@@ -25,16 +25,16 @@ def log_and_print(msg):
 
 
 def get_cpu_temperature():
-    # w = wmi.WMI(namespace="root\\wmi")
-    # temperature_info = w.MSAcpi_ThermalZoneTemperature()
-    # if not temperature_info:
-    #     return None  # Не удалось получить данные
-    # # Обычно возвращается список, берем первую зону
-    # temp_kelvin_x10 = temperature_info[0].CurrentTemperature
-    # # Переводим из десятых долей Кельвина в Цельсии
-    # temp_celsius = (temp_kelvin_x10 / 10) - 273.15
-    # return round(temp_celsius, 1)
-    return 5
+    w = wmi.WMI(namespace="root\\wmi")
+    temperature_info = w.MSAcpi_ThermalZoneTemperature()
+    if not temperature_info:
+        return None  # Не удалось получить данные
+    # Обычно возвращается список, берем первую зону
+    temp_kelvin_x10 = temperature_info[0].CurrentTemperature
+    # Переводим из десятых долей Кельвина в Цельсии
+    temp_celsius = (temp_kelvin_x10 / 10) - 273.15
+    return round(temp_celsius, 1)
+    #return 5
 
 def suspend_vm(vm_path):
     log_and_print(f"Suspending VM: {vm_path}")
