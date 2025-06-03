@@ -201,6 +201,9 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                     s = 0
                     if first_line:
                         if filename == s_f:
+                            for key in list(sum_dict):
+                                if sum_dict[key] == 0:
+                                    del sum_dict[key]
                             text += "\nВСЕГО НА АУКЦИОНЕ:\n" + str(sum_dict).replace(" ", "") + f' {ss}' + "\nВ ХРАНИЛИЩЕ:\n"
                         ah_max = "?"
 
@@ -215,14 +218,17 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
                         if delta_t_real <= delta_t:
                             for k, v in apples.items():
-                                if k != 'z' and k != 'max':
+                                if k != 'z' and k != '_M_':
                                     s += v
                                     ss += v
-                                sum_dict[k] = sum_dict.get(k, 0) + v
+                                sum_dict[k] = sum_dict.get(k, 0) + abs(v)
 
                                 if k == 'max':
                                     ah_max = str(v)
-                            text += "\n" + str(apples).replace(" ", "").replace(": ", ":") + f' {s}'
+                            for key in list(apples):
+                                if apples[key] == 0:
+                                    del apples[key]
+                            text += "\n" + str(apples).replace(" ", "").replace(": ", ":").replace("-","?") + f' {s}'
                         else:
                             t = delta_t_real // 6 / 10
                             text += f"\ntimeout : {t}"
@@ -647,7 +653,8 @@ async def make_money(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
         full_path = os.path.join(config.log_dir, filename)
         if os.path.isfile(full_path) and "moneyan" in filename:
             with open(full_path, 'rb') as photo:
-                await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=filename)
+                name = filename.replace("money","").replace(".png","")
+                await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=name)
                 await asyncio.sleep(0.5)
 
 def get_all_files(template: str, folder: str) -> list:
