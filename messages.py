@@ -642,11 +642,13 @@ async def make_ss(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
 async def make_money(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     if config.mode == config.mode_buyer:
         return
-    money = config.log_dir + "/money.png"
 
-    with open(money, 'rb') as photo:
-        await context.bot.send_photo(chat_id=chat_id, photo=photo)
-        await asyncio.sleep(0.5)
+    for filename in os.listdir(config.log_dir):
+        full_path = os.path.join(config.log_dir, filename)
+        if os.path.isfile(full_path) and "moneyan" in filename:
+            with open(full_path, 'rb') as photo:
+                await context.bot.send_photo(chat_id=chat_id, photo=photo)
+                await asyncio.sleep(0.5)
 
 def get_all_files(template: str, folder: str) -> list:
     res = []
