@@ -146,7 +146,6 @@ def create_inventory_log() -> str:
             apples = eval(first_line)
             apples = dict(sorted(apples.items()))
             s = sum(apples.values())
-            print(apples)
             return f"\ninventory:\n{str(apples)} {s}"
     except Exception as e:
         print(f"except: {e}")
@@ -234,7 +233,10 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                             t = str(apples).replace(" ", "")
                             t = t.replace(": ", ":")
                             t = t.replace("-","?")
-                            t = t.replace("_M_","*")
+                            t = t.replace("_M_","")
+                            t = t.replace("{:?", "{?")
+                            t = t.replace("{:1", "{1")
+                            t = t.replace("{:", "{ ")
 
                             text += "\n" + t + f' {s}'
                         else:
@@ -246,6 +248,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                     text += "\n" + first_line
         except Exception as e:
             text += "\n err"
+    text += "\n"
     for an in ans:
         text += format.get_storage(an)
 

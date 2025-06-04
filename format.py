@@ -9,8 +9,8 @@ def get_storage(an:int):
     l_dir = config.log_dir
     fn = l_dir + f'\\storage_an{an}.ah'
 
-    name = "{stor:" + f"{an}"
-    err = name + ", error \}\n"
+    name = "{stor:" + f"{an}, "
+    err = name + "error }\n"
 
     try:
         if os.path.exists(fn):
