@@ -1,3 +1,42 @@
+import os
+from datetime import datetime
+import time
+
+import config
+
+
+def get_storage(an:int):
+    l_dir = config.log_dir
+    fn = l_dir + f'\\storage_an{an}.ah'
+
+    name = "{stor:" + f"{an}"
+    err = name + ", error \}\n"
+
+    try:
+        if os.path.exists(fn):
+            last_modified_time = os.path.getmtime(fn)
+            current_time = time.time()
+            delta_t = 60 * 10
+            if current_time - last_modified_time <= delta_t:
+                with open(fn, 'r') as file:
+                    first_line = file.readline().strip()
+
+                    apples = eval(first_line)
+                    apples = dict(sorted(apples.items()))
+
+                    res = str(apples)
+
+                    res = res.replace("{", name)
+                    res += "\n"
+                    return res
+    except Exception as e:
+        print(e)
+    return err
+
+
+
+
+
 '''import re
 from typing import List, Dict
 

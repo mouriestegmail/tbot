@@ -7,6 +7,7 @@ import time
 import pathlib
 import os
 import config
+import format
 
 import pyautogui
 from PIL import Image
@@ -27,6 +28,8 @@ workers = ["A1","B1",
            "A3", "B3", 
            "A4", "B4", 
            "A5", "B5"]
+
+ans = [604, 605]
 
 def split_text_into_chunks(text: str, lines_per_chunk: int = 30) -> list:
     lines = text.splitlines()
@@ -243,6 +246,9 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                     text += "\n" + first_line
         except Exception as e:
             text += "\n err"
+    for an in ans:
+        text += format.get_storage(an)
+
     text += create_inventory_log()
 
     text = format_text(text)
