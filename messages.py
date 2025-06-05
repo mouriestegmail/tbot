@@ -188,8 +188,8 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     for i in workers:
         f_list.append(l_dir + f'\\{i}.ah')
 
-    s_f = l_dir + f'\\storage.ah'
-    f_list.append(s_f)
+    # s_f = l_dir + f'\\storage.ah'
+    # f_list.append(s_f)
     ss = 0
     sum_dict = dict()
     for filename in f_list:
@@ -202,12 +202,12 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
                     s = 0
                     if first_line:
-                        if filename == s_f:
-                            for key in list(sum_dict):
-                                if sum_dict[key] == 0:
-                                    del sum_dict[key]
-                            text += "\nВСЕГО НА АУКЦИОНЕ:\n" + str(sum_dict).replace(" ", "") + f' {ss}' + "\nВ ХРАНИЛИЩЕ:\n"
-                        ah_max = "?"
+                        # if filename == s_f:
+                        #     for key in list(sum_dict):
+                        #         if sum_dict[key] == 0:
+                        #             del sum_dict[key]
+                        #
+                        # ah_max = "?"
 
                         last_modified_time = os.path.getmtime(filename)
                         current_time = time.time()
@@ -248,7 +248,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                     text += "\n" + first_line
         except Exception as e:
             text += "\n err"
-    text += "\n"
+    text += "\nВСЕГО НА АУКЦИОНЕ:\n" + str(sum_dict).replace(" ", "") + f' {ss}' + "\nВ ХРАНИЛИЩЕ:\n"
     for an in ans:
         text += format.get_storage(an)
 
@@ -621,7 +621,7 @@ async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, *, count=30, tex
             text_to_send = "```log\n" + text_to_send + "\n```"
             await context.bot.send_message(chat_id=chat_id, text=text_to_send, parse_mode='Markdown')
         except Exception as e:
-            await context.bot.send_message(chat_id=chat_id, text=f"file open error {filename}")
+            await context.bot.send_message(chat_id=chat_id, text=f"file open error {filename} {e}")
     else:
         try:
             with open(filename, 'rb') as text_file:

@@ -24,9 +24,14 @@ def get_storage(an:int):
                     apples = eval(first_line)
                     apples = dict(sorted(apples.items()))
 
+                    for key in list(apples):
+                        if apples[key] == 0:
+                            del apples[key]
+
                     res = str(apples)
 
                     res = res.replace("{", name)
+                    res = res.replace(": ", ":")
                     res += "\n"
                     return res
     except Exception as e:

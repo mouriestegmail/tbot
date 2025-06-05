@@ -67,7 +67,10 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     # if chat_id not in config.users:
     #     return
-    text = update.message.text.lower()
+    if update.message.text:
+        text = update.message.text.lower()
+    else:
+        return None
 
     await context.bot.send_message(chat_id=chat_id, text=get_last_commit_message())
 
