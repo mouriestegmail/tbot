@@ -98,7 +98,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             integer_value = int(''.join(re.findall(r'\d+', text)))
         except ValueError:
             pass
-        await make_log(chat_id, context, count=integer_value)
+        await make_log(chat_id, context, count=integer_value,text=text)
     elif "comm" in text:
         print(text)
         await create_command(chat_id, context, text)

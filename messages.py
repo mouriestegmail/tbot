@@ -596,7 +596,7 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
     return None
 
 
-async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, *, count=30, text: str, full=False) -> None:
+async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, *, count=30, text: str = "", full=False) -> None:
     l_dir = config.log_dir
     current_time = datetime.now()
     filename = l_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
