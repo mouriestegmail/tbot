@@ -3,10 +3,12 @@ import time
 import logging
 import wmi
 
-vm_list = [
-    "C:\\VMs\\vm1.vmx",
-    "C:\\VMs\\vm2.vmx",
-    "C:\\VMs\\vm3.vmx",
+pause_file_list = [
+    "A2B2.pause",
+    "A3B3.pause",
+    "A4B4.pause",
+    "A5B5.pause",
+    "A1B1.pause"
 ]
 
 cooldown = 30 * 60  # 30 минут между приостановками
@@ -15,7 +17,7 @@ logging.basicConfig(
     filename='vm_manager.log',
     level=logging.INFO,
     format='%(asctime)s %(levelname)s: %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    datefmt='%H:%M'
 )
 
 def log_and_print(msg):
@@ -39,6 +41,10 @@ def get_cpu_temperature():
 def suspend_vm(vm_path):
     log_and_print(f"Suspending VM: {vm_path}")
     # subprocess.run(["vmrun", "suspend", vm_path])
+
+def pause_script(vm_path):
+    log_and_print(f"Resuming VM: {vm_path}")
+    # subprocess.run(["vmrun", "start", vm_path])
 
 def resume_vm(vm_path):
     log_and_print(f"Resuming VM: {vm_path}")
