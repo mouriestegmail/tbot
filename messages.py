@@ -405,8 +405,10 @@ async def set_conf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None
             json.load(f)  # проверка валидности
 
         shutil.move(temp_filename, fn)  # атомарная замена
-        await make_conf(config.martin, context)
-        await make_conf(config.andrei, context)
+        for id in [config.martin, config.andrei]:
+            if chat_id != id:
+                await context.bot.send_message(chat_id=id, text=command)
+            await make_conf(id, context)
 
     except Exception as e:
         await context.bot.send_message(chat_id=chat_id,
@@ -491,9 +493,10 @@ async def set_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -
             json.load(f)
 
         shutil.move(temp_fn, fn)
-
-        await make_conf_buyer(config.martin, context)
-        await make_conf_buyer(config.andrei, context)
+        for id in [config.martin, config.andrei]:
+            if chat_id != id:
+                await context.bot.send_message(chat_id=id, text=command)
+            await make_conf_buyer(id, context)
 
     except Exception as e:
         await context.bot.send_message(chat_id=chat_id, text=f"Write error: {e}\nRestoring backup...")
