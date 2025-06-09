@@ -8,6 +8,8 @@ import sys
 import asyncio
 import config
 import file_handler
+import os
+import signal
 
 
 from watchdog.observers import Observer
@@ -139,6 +141,14 @@ history - 14 day history
         text = "```help\n" + text + "\n```"
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
+# Запуск дочернего скрипта
+child = subprocess.Popen(
+    [sys.executable, '../mnbot/parser_png.py'],
+    preexec_fn=os.setsid if os.name != 'nt' else None,  # только на Unix
+    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
+)
+
+
 def main() -> None:
 
 
@@ -185,4 +195,15 @@ if __name__ == "__main__":
           config.watch_dir,
 
           sep="\n")
-    main()
+
+    try:
+        main()
+    except Exception as e:
+        print("Завершение родителя.")
+        try:
+            if os.name == 'nt':
+                child.send_signal(signal.CTRL_BREAK_EVENT)
+            else:
+                os.killpg(os.getpgid(child.pid), signal.SIGTERM)
+        except Exception as e:
+            print(f"Ошибка при завершении дочернего: {e}")
