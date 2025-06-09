@@ -12,6 +12,7 @@ import format
 import pyautogui
 from PIL import Image
 from telegram.ext import ContextTypes
+from numbers import Number
 
 
 
@@ -421,6 +422,42 @@ async def set_conf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None
         if os.path.exists(temp_filename):
             os.remove(temp_filename)
 
+async def set_conf_buyer_local(chat_id, context: ContextTypes.DEFAULT_TYPE, command="") -> None:
+    res = "Invalid format.\nExample: `setconf ser=4.5` or `setconf money=20`"
+    try:
+        while True:
+            parts = command.split("=")
+            if len(parts) != 2:
+                break
+            value = float(parts[1])
+            key = parts[0]
+
+            fn = config.buyer_config_json_local
+
+            with open(fn, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+                if key in data:
+                    if isinstance(data[key], Number):
+                        data[key] = value
+                    else:
+                        break
+                else:
+                    data[key] = value
+
+            with open(fn, 'w', encoding='utf-8') as file:
+                json.dump(data, file, indent=2, ensure_ascii=False)
+            res = "successful"
+            break
+
+
+    except Exception as e:
+        res += "\n" + str(e)
+
+
+
+    await context.bot.send_message(chat_id=chat_id, text=res, parse_mode='Markdown')
+
+
 async def set_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
     fn = config.config_json  # path to autobuy.json
 
@@ -437,7 +474,7 @@ async def set_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -
     command = parts[1]
 
     if not re.fullmatch(r"^[a-z]{3}=[0-9]+([.,][0-9]+)?$", command):
-        await context.bot.send_message(chat_id=chat_id, text="Invalid format.\nExample: `setconf ser=4.5`", parse_mode='Markdown')
+        await set_conf_buyer_local(chat_id, context, command)
         return
 
     key, val = command.split("=")
@@ -530,6 +567,7 @@ def get_price_buyer(key):
         return None
 
 async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_key, plus_or_minus"):
+    return
     buyer = False
     worker = False
     sign = 1
