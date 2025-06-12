@@ -406,7 +406,7 @@ async def set_conf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None
             json.load(f)  # проверка валидности
 
         shutil.move(temp_filename, fn)  # атомарная замена
-        for id in [config.martin, config.andrei]:
+        for id in [config.andrei]:
             if chat_id != id:
                 await context.bot.send_message(chat_id=id, text=command)
             await make_conf(id, context)
@@ -530,7 +530,7 @@ async def set_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -
             json.load(f)
 
         shutil.move(temp_fn, fn)
-        for id in [config.martin, config.andrei]:
+        for id in [config.andrei]:
             if chat_id != id:
                 await context.bot.send_message(chat_id=id, text=command)
             await make_conf_buyer(id, context)
