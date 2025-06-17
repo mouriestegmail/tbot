@@ -42,8 +42,8 @@ class NewFileHandler(FileSystemEventHandler):
             await self.bot.send_message(chat_id=config.bot_connect_group, text=f"Появился файл: {name}")
             return
 
-    def is_img_file(self, file:str):
-        return "png" in file.lower() or "jpg" in file.lower()
+    def is_img_file(self, file: Path) -> bool:
+        return file.suffix.lower() in (".png", ".jpg", ".jpeg")
 
     def is_time_file(self, file):
         return "time" in file
