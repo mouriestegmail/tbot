@@ -30,11 +30,20 @@ class NewFileHandler(FileSystemEventHandler):
             await self.handler_time()
             if os.path.isfile(filepath):
                 os.remove(filepath)
+        elif self.is_img_file(filepath):
+            await self.bot.send_document(chat_id=config.andrei, document=filepath, filename=name)
+            return
+
         elif self.is_err_file(filepath):
             await self.bot.send_message(chat_id=config.martin, text=f"{name}")
             await self.bot.send_message(chat_id=config.andrei, text=f"{name}")
+            return
         else:
             await self.bot.send_message(chat_id=config.bot_connect_group, text=f"Появился файл: {name}")
+            return
+
+    def is_img_file(self, file:str):
+        return "png" in file.lower() or "jpg" in file.lower()
 
     def is_time_file(self, file):
         return "time" in file

@@ -525,6 +525,8 @@ async def set_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -
     try:
         with open(temp_fn, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
+        with open("C:/project/autobuy.copy", "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
 
         with open(temp_fn, "r", encoding="utf-8") as f:
             json.load(f)
