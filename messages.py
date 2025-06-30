@@ -24,13 +24,12 @@ short_to_full = {
     "ser": "Серная кислота",
 }
 
-workers = ["A1","B1",
-           "A2","B2", 
-           "A3", "B3", 
-           "A4", "B4", 
-           "A5", "B5"]
+workers = ["A1","B1","C1",
+           "A2","B2", "C2",
+           "A3", "B3", "C3", "D3",
+           "A4", "B4"]
 
-ans = [604, 605]
+ans = [604, 605, 505]
 
 def split_text_into_chunks(text: str, lines_per_chunk: int = 30) -> list:
     lines = text.splitlines()
@@ -193,7 +192,9 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     # f_list.append(s_f)
     ss = 0
     sum_dict = dict()
+    worker = -1
     for filename in f_list:
+        worker += 1
         try:
             with open(filename, 'r') as file:
                 first_line = file.readline().strip()
@@ -239,7 +240,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                             t = t.replace("{:1", "{1")
                             t = t.replace("{:", "{ ")
 
-                            text += "\n" + t + f' {s}'
+                            text += "\n"+workers[worker] + t + f' {s}'
                         else:
                             t = delta_t_real // 6 / 10
                             text += f"\ntimeout : {t}"
@@ -248,6 +249,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                     print(e)
                     text += "\n" + first_line
         except Exception as e:
+            continue
             text += "\n err"
     text += "\nВСЕГО НА АУКЦИОНЕ:\n" + str(sum_dict).replace(" ", "") + f' {ss}' + "\nВ ХРАНИЛИЩЕ:\n"
     for an in ans:
@@ -322,7 +324,7 @@ async def make_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
         if not isinstance(price, (int, float)):
             lines.append(f"Некорректная цена для '{full_name}': {price}")
             continue
-        lines.append(f"{short}: {price / 1_000_000:.1f}")
+        lines.append(f"{short}: {price / 1_000_000:.2f}")
 
     await context.bot.send_message(chat_id=chat_id, text="\n".join(lines), parse_mode='Markdown')
 

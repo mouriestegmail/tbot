@@ -17,30 +17,42 @@ class NewFileHandler(FileSystemEventHandler):
 
     def on_created(self, event):
         if not event.is_directory:
-            asyncio.run_coroutine_threadsafe(
+            fut = asyncio.run_coroutine_threadsafe(
                 self.notify(event.src_path),
                 self.loop
             )
+            try:
+                fut.result()  # ⬅️ добавлено: покажет ошибку прямо в консоли
+            except Exception as e:
+                print(f"[Ошибка в notify] {e}")
 
     async def notify(self, filepath):
-        name = Path(filepath).name
-        if name.startswith(".#"):
-            return  # игнорировать временные файлы
-        if self.is_time_file(filepath):
-            await self.handler_time()
-            if os.path.isfile(filepath):
-                os.remove(filepath)
-        elif self.is_img_file(filepath):
-            await self.bot.send_document(chat_id=config.andrei, document=filepath, filename=name)
-            return
+        filepath = Path(filepath)  # ← вот это добавь
+        name = filepath.name
 
-        elif self.is_err_file(filepath):
+        print(filepath)
+
+        if name.startswith(".#"):
+            print(1)
+            return
+        if self.is_time_file(str(filepath)):
+            print("time")
+            await self.handler_time()
+            if filepath.is_file():
+                filepath.unlink()
+        elif self.is_img_file(filepath):
+            print("png")
+            sleep(2)
+            await self.bot.send_document(chat_id=config.andrei, document=str(filepath), filename=name)
+            return
+        elif self.is_err_file(str(filepath)):
+            print("err")
             await self.bot.send_message(chat_id=config.martin, text=f"{name}")
             await self.bot.send_message(chat_id=config.andrei, text=f"{name}")
             return
         else:
+            print("else")
             await self.bot.send_message(chat_id=config.bot_connect_group, text=f"Появился файл: {name}")
-            return
 
     def is_img_file(self, file: Path) -> bool:
         return file.suffix.lower() in (".png", ".jpg", ".jpeg")
