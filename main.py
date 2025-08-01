@@ -142,11 +142,11 @@ history - 14 day history
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 # Запуск дочернего скрипта
-child = subprocess.Popen(
-    [sys.executable, '../mnbot/parser_png.py'],
-    preexec_fn=os.setsid if os.name != 'nt' else None,  # только на Unix
-    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
-)
+#child = subprocess.Popen(
+#    [sys.executable, '../mnbot/parser_png.py'],
+#    preexec_fn=os.setsid if os.name != 'nt' else None,  # только на Unix
+#    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
+#)
 
 
 def main() -> None:
@@ -162,6 +162,7 @@ def main() -> None:
 
     loop = asyncio.get_event_loop()
     observer = Observer()
+    print(f"watch dir: {config.watch_dir}")
     observer.schedule(file_handler.NewFileHandler(app.bot, loop),
                       path=config.watch_dir,
                       recursive=False)
@@ -199,11 +200,12 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        print("Завершение родителя.")
+        print("Завершение родителя.", e)
         try:
-            if os.name == 'nt':
-                child.send_signal(signal.CTRL_BREAK_EVENT)
-            else:
-                os.killpg(os.getpgid(child.pid), signal.SIGTERM)
+            pass
+            #if os.name == 'nt':
+            #    child.send_signal(signal.CTRL_BREAK_EVENT)
+            #else:
+            #    os.killpg(os.getpgid(child.pid), signal.SIGTERM)
         except Exception as e:
             print(f"Ошибка при завершении дочернего: {e}")
