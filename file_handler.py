@@ -43,10 +43,11 @@ class NewFileHandler(FileSystemEventHandler):
         elif self.is_img_file(filepath):
             print("png")
             sleep(2)
-            if "photo" in filepath:
+            str_path = str(filepath)
+            if "photo" in str_path:
                 for id_chat in [config.andrei, config.martin]:
-                    await self.bot.send_document(chat_id=id_chat, document=str(filepath), filename=name)
-                    await asyncio.sleep(0.5)
+                    with open(filepath, 'rb') as photo:
+                        await self.bot.send_photo(chat_id=id_chat, photo=photo, caption=name)
                 return
             await self.bot.send_document(chat_id=config.andrei, document=str(filepath), filename=name)
             return
