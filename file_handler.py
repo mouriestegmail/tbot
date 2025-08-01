@@ -45,7 +45,8 @@ class NewFileHandler(FileSystemEventHandler):
             sleep(2)
             if "photo" in filepath:
                 for id_chat in [config.andrei, config.martin]:
-                    await self.bot.send_photo(chat_id=id_chat, photo=str(filepath), caption=name)
+                    await self.bot.send_document(chat_id=id_chat, document=str(filepath), filename=name)
+                    await asyncio.sleep(0.5)
                 return
             await self.bot.send_document(chat_id=config.andrei, document=str(filepath), filename=name)
             return
