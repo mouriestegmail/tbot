@@ -43,6 +43,10 @@ class NewFileHandler(FileSystemEventHandler):
         elif self.is_img_file(filepath):
             print("png")
             sleep(2)
+            if "photo" in filepath:
+                for id_chat in [config.andrei, config.martin]:
+                    await self.bot.send_photo(chat_id=id_chat, photo=str(filepath), caption=name)
+                return
             await self.bot.send_document(chat_id=config.andrei, document=str(filepath), filename=name)
             return
         elif self.is_err_file(str(filepath)):
