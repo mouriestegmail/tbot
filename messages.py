@@ -241,7 +241,8 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                             text += "\n"+workers[worker] + t + f' {s}'
                         else:
                             t = delta_t_real // 6 / 10
-                            text += f"\ntimeout : {t}"
+                            if t < 1000:
+                                text += f"\ntimeout : {t}"
                         # text += p + "\n" + str(apples)
                 except Exception as e:
                     print(e)
