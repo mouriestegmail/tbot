@@ -288,7 +288,8 @@ async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def make_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Загрузка buyer.json
-    path = "../mnbot/configs/buyer.json"
+    from pathlib import Path
+    path = Path("../mnbot/configs/buyer.json")
     if not path.exists():
         await context.bot.send_message(chat_id=chat_id, text="Файл buyer.json не найден.")
         return
@@ -303,6 +304,9 @@ async def make_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def set_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
     config_dir = config.config_dir
     fn = "../mnbot/configs/buyer.json"
+    from pathlib import Path
+    path = Path(fn)
+
 
     # Ожидаем формат: "setbconf key=value"
     try:
@@ -317,7 +321,7 @@ async def set_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> Non
 
     # Чтение JSON
     try:
-        with fn.open(encoding="utf-8") as f:
+        with path.open(encoding="utf-8") as f:
             data = json.load(f)
     except Exception as e:
         await context.bot.send_message(chat_id=chat_id, text=f"Ошибка чтения {fn}: {e}")
