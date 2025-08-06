@@ -24,12 +24,9 @@ short_to_full = {
     "ser": "Серная кислота",
 }
 
-workers = ["A1","B1","C1",
-           "A2","B2", "C2",
-           "A3", "B3", "C3", "D3",
-           "A4", "B4"]
+workers = [w + str(n) for n in range(6) for w in "ABCDE"]
 
-ans = [604, 605, 505]
+ans = [604, 605, 603, 602]
 
 def split_text_into_chunks(text: str, lines_per_chunk: int = 30) -> list:
     lines = text.splitlines()
@@ -288,6 +285,66 @@ async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     text = "```conf\n" + text + "\n```"
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+
+async def make_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # Загрузка buyer.json
+    path = "../mnbot/configs/buyer.json"
+    if not path.exists():
+        await context.bot.send_message(chat_id=chat_id, text="Файл buyer.json не найден.")
+        return
+
+    with path.open(encoding="utf-8") as f:
+        data = json.load(f)
+
+    text = f"```json\n{json.dumps(data, indent=2, ensure_ascii=False)}\n```"
+
+    await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+
+async def set_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
+    config_dir = config.config_dir
+    fn = "../mnbot/configs/buyer.json"
+
+    # Ожидаем формат: "setbconf key=value"
+    try:
+        assignment = text.split(" ", 1)[1]  # Получаем "key=value"
+        key, value_str = assignment.split("=", 1)
+    except (IndexError, ValueError):
+        await context.bot.send_message(chat_id=chat_id, text="Ожидается формат: setbconf ключ=значение")
+        return
+
+    key = key.strip()
+    value_str = value_str.strip()
+
+    # Чтение JSON
+    try:
+        with fn.open(encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        await context.bot.send_message(chat_id=chat_id, text=f"Ошибка чтения {fn}: {e}")
+        return
+
+    # Проверка ключа
+    if key not in data:
+        await context.bot.send_message(chat_id=chat_id, text=f"Ключ '{key}' не найден в конфиге.")
+        return
+
+    # Преобразование значения
+    try:
+        value = float(value_str)
+    except ValueError:
+        await context.bot.send_message(chat_id=chat_id, text=f"Значение '{value_str}' не является числом.")
+        return
+
+    # Обновление и запись
+    data[key] = value
+    try:
+        with fn.open("w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        await context.bot.send_message(chat_id=chat_id, text=f"Ошибка записи в файл: {e}")
+        return
+
+    await make_bconf(chat_id, context)
 
 
 async def make_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -725,9 +782,11 @@ async def make_money(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     for filename in os.listdir(config.log_dir):
         full_path = os.path.join(config.log_dir, filename)
         if os.path.isfile(full_path) and "moneyan" in filename:
+            age_minutes = int((time.time() - os.path.getmtime(full_path)) / 60)
+            name = filename.replace("money", "").replace(".png", "")
+            caption = f"{name} ({age_minutes}m)"
             with open(full_path, 'rb') as photo:
-                name = filename.replace("money","").replace(".png","")
-                await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=name)
+                await context.bot.send_photo(chat_id=chat_id, photo=photo, caption=caption)
                 await asyncio.sleep(0.5)
 
 def get_all_files(template: str, folder: str) -> list:
