@@ -25,6 +25,7 @@ short_to_full = {
 }
 
 workers = [w + str(n) for n in range(6) for w in "ABCDE"]
+print("workers: ", workers)
 
 ans = [604, 605, 603, 602]
 
