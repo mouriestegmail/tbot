@@ -302,7 +302,6 @@ async def make_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 async def set_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
-    config_dir = config.config_dir
     fn = "../mnbot/configs/buyer.json"
     from pathlib import Path
     path = Path(fn)
@@ -342,7 +341,7 @@ async def set_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> Non
     # Обновление и запись
     data[key] = value
     try:
-        with fn.open("w", encoding="utf-8") as f:
+        with path.open("w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
     except Exception as e:
         await context.bot.send_message(chat_id=chat_id, text=f"Ошибка записи в файл: {e}")
