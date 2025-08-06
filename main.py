@@ -109,7 +109,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await create_command(chat_id, context, text)
     elif "sum" in text:
         # await make_log(chat_id, context, count=5)
-        await make_money(chat_id, context)
+        # await make_money(chat_id, context)
         await make_sum(chat_id, context)
 
     elif "bconf" in text:
