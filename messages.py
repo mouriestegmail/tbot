@@ -344,6 +344,7 @@ async def set_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> Non
     data[key] = value
     try:
         with path.open("w", encoding="utf-8") as f:
+            print(path)
             json.dump(data, f, indent=2, ensure_ascii=False)
     except Exception as e:
         await context.bot.send_message(chat_id=chat_id, text=f"Ошибка записи в файл: {e}")
