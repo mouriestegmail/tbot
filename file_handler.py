@@ -30,6 +30,8 @@ class NewFileHandler(FileSystemEventHandler):
         filepath = Path(filepath)  # ← вот это добавь
         name = filepath.name
 
+        is_mute = "mute" in name
+
         print(filepath)
 
         if name.startswith(".#"):
@@ -47,18 +49,18 @@ class NewFileHandler(FileSystemEventHandler):
             if "photo" in str_path:
                 for id_chat in [config.andrei, config.martin]:
                     with open(filepath, 'rb') as photo:
-                        await self.bot.send_photo(chat_id=id_chat, photo=photo, caption=name)
+                        await self.bot.send_photo(chat_id=id_chat, photo=photo, caption=name, disable_notification=is_mute)
                 return
-            await self.bot.send_document(chat_id=config.andrei, document=str(filepath), filename=name)
+            await self.bot.send_document(chat_id=config.andrei, document=str(filepath), filename=name, disable_notification=is_mute)
             return
         elif self.is_err_file(str(filepath)):
             print("err")
-            await self.bot.send_message(chat_id=config.martin, text=f"{name}")
-            await self.bot.send_message(chat_id=config.andrei, text=f"{name}")
+            await self.bot.send_message(chat_id=config.martin, text=f"{name}", disable_notification=is_mute)
+            await self.bot.send_message(chat_id=config.andrei, text=f"{name}", disable_notification=is_mute)
             return
         else:
             print("else")
-            await self.bot.send_message(chat_id=config.bot_connect_group, text=f"Появился файл: {name}")
+            await self.bot.send_message(chat_id=config.bot_connect_group, text=f"Появился файл: {name}", disable_notification=is_mute)
 
     def is_img_file(self, file: Path) -> bool:
         return file.suffix.lower() in (".png", ".jpg", ".jpeg")
