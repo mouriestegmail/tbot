@@ -10,7 +10,7 @@ def get_storage(an:int):
     fn = l_dir + f'\\storage_an{an}.ah'
 
     name = "{stor:" + f"{an}, "
-    err = name + "error }\n"
+    err = ""
 
     try:
         if os.path.exists(fn):

@@ -27,7 +27,8 @@ short_to_full = {
 workers = [w + str(n) for n in range(6) for w in "ABCDE"]
 print("workers: ", workers)
 
-ans = [604, 605, 603, 602]
+ans = [501, 502, 503, 504, 505, 506, 507,
+       604, 605, 603, 602]
 
 def split_text_into_chunks(text: str, lines_per_chunk: int = 30) -> list:
     lines = text.splitlines()
@@ -252,7 +253,9 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
             text += "\n err"
     text += "\nВСЕГО НА АУКЦИОНЕ:\n" + str(sum_dict).replace(" ", "") + f' {ss}' + "\nВ ХРАНИЛИЩЕ:\n"
     for an in ans:
-        text += format.get_storage(an)
+        stor = format.get_storage(an)
+        if len(stor) > 4:
+            text += stor
 
     text += create_inventory_log()
 
