@@ -827,6 +827,14 @@ async def make_fn(chat_id, context: ContextTypes.DEFAULT_TYPE, text):
 
     for fn in fns:
         try:
+            last_modified_time = os.path.getmtime(fn)
+            current_time = time.time()
+            delta_t_real = current_time - last_modified_time
+
+            t = delta_t_real // 6 / 10
+            if t > 1000:
+                continue
+
             folder_name = os.path.basename(os.path.dirname(fn))
             with open(fn, 'rb') as photo:
                 await context.bot.send_photo(
