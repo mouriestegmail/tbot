@@ -187,7 +187,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     for i in workers:
         for an in ans:
-            f_list.append(l_dir + f'\\{i}.ah_{an}')
+            f_list.append(l_dir + f'\\{i}.ah_an{an}')
 
     # s_f = l_dir + f'\\storage.ah'
     # f_list.append(s_f)
