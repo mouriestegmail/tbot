@@ -184,16 +184,18 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
              f'\n{str(all_a).replace(" ", "")}  {ss}\nНА АУКЦИОНЕ:')
 
     f_list = []
+
     for i in workers:
-        f_list.append(l_dir + f'\\{i}.ah')
+        for an in ans:
+            f_list.append(l_dir + f'\\{i}.ah_{an}')
 
     # s_f = l_dir + f'\\storage.ah'
     # f_list.append(s_f)
     ss = 0
     sum_dict = dict()
-    worker = -1
+    worker = -len(ans)
     for filename in f_list:
-        worker += 1
+        worker += len(ans)
         try:
             with open(filename, 'r') as file:
                 first_line = file.readline().strip()
@@ -239,7 +241,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                             t = t.replace("{:1", "{1")
                             t = t.replace("{:", "{ ")
 
-                            text += "\n"+workers[worker] + t + f' {s}'
+                            text += "\n"+workers[worker] + f"_{filename[-3:]}" + t + f' {s}'
                         else:
                             t = delta_t_real // 6 / 10
                             if t < 1000:
