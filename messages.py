@@ -241,6 +241,8 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
                             t = t.replace("{:1", "{1")
                             t = t.replace("{:", "{ ")
 
+                            print(t)
+
                             text += "\n"+workers[worker] + f"_{filename[-3:]}" + t + f' {s}'
                         else:
                             t = delta_t_real // 6 / 10
