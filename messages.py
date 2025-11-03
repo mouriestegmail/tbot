@@ -25,6 +25,7 @@ short_to_full = {
 }
 
 workers = [w + str(n) for n in range(6) for w in "ABCDE"]
+# ans["an504", "an505", "an507"]
 print("workers: ", workers)
 
 ans = [501, 502, 503, 504, 505, 506, 507,
@@ -266,6 +267,9 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     text = format_text(text)
     text = text.replace(" z:", "  ")
+
+    text = re.sub(r"z:(\d+)", r"'\1'", text)
+
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
     import shutil
 
