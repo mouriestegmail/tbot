@@ -244,8 +244,13 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
                             print(t, filename, type[filename], len(filename), )
 
+                            w = filename[13:15]
+                            if w[1] in "13579":
+                                w = "." + w
+                            else:
+                                w = " " + w
 
-                            text += "\n"+filename[13:15] + f"_{filename[-3:]}" + t + f' {s}'
+                            text += "\n"+ w + f"_{filename[-3:]}" + t + f' {s}'
                         else:
                             t = delta_t_real // 6 / 10
                             if t < 1000:
