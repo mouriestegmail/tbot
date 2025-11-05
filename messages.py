@@ -194,7 +194,7 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
                             diff_str = "   "
                         else:
                             diff = value - prev_value
-                            diff_str = f"{diff:+3d}"
+                            diff_str = f"{diff:>3d}"
 
                         value_str = f"{value:>4d}"
 
