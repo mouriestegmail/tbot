@@ -165,6 +165,7 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
             try:
                 with open(summary_file, "r", encoding="utf-8") as f:
                     text = f.read().strip()
+                    text = f"```{today}\n {text} \n```"
             except Exception as e:
                 text = f"*{today}*\nError reading file: `{e}`"
 
