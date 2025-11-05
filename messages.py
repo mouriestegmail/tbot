@@ -160,7 +160,7 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     if match:
         interval = int(match.group())
     else:
-        interval = -1
+        interval = 30
 
     try:
         if not os.path.isfile(summary_file):
@@ -174,18 +174,16 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
                 lines = [line.strip() for line in content.splitlines() if line.strip()]
 
                 # фильтруем по интервалу
-                if interval == -1:
-                    filtered_lines = lines
-                else:
-                    filtered_lines = []
-                    for line in lines:
-                        try:
-                            time_part = line.split(" - ")[0]  # "11:51 - 295" → "11:51"
-                            hour, minute = map(int, time_part.split(":"))
-                            if minute % interval == 0:
-                                filtered_lines.append(line)
-                        except Exception:
-                            continue  # на случай битой строки
+
+                filtered_lines = []
+                for line in lines:
+                    try:
+                        time_part = line.split(" - ")[0]  # "11:51 - 295" → "11:51"
+                        hour, minute = map(int, time_part.split(":"))
+                        if minute % interval == 0:
+                            filtered_lines.append(line)
+                    except Exception:
+                        continue  # на случай битой строки
 
                 if not filtered_lines:
                     res = f"*{today}*\nNo entries for interval {interval} min."
