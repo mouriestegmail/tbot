@@ -151,31 +151,54 @@ def create_inventory_log() -> str:
         print(f"except: {e}")
     return "\nNo data"
 
-async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     folder = config.log_dir
     today = datetime.now().strftime("%d.%m.%Y")
     summary_file = os.path.join(folder, f"{today}_sum.sold")
 
-    text = "try...."
+    match = re.search(r"\d+", text)
+    if match:
+        interval = int(match.group())
+    else:
+        interval = -1
 
     try:
         if not os.path.isfile(summary_file):
-            text = f"*{today}*\nNo data for today yet."
+            res = f"*{today}*\nNo data for today yet."
         else:
             try:
                 with open(summary_file, "r", encoding="utf-8") as f:
                     content = f.read().strip()
+
                 # убрать лишние пробелы у каждой строки
-                content = "\n".join(line.strip() for line in content.splitlines())
-                text = f"```{today}\n{content}\n```"
+                lines = [line.strip() for line in content.splitlines() if line.strip()]
+
+                # фильтруем по интервалу
+                if interval == -1:
+                    filtered_lines = lines
+                else:
+                    filtered_lines = []
+                    for line in lines:
+                        try:
+                            time_part = line.split(" - ")[0]  # "11:51 - 295" → "11:51"
+                            hour, minute = map(int, time_part.split(":"))
+                            if minute % interval == 0:
+                                filtered_lines.append(line)
+                        except Exception:
+                            continue  # на случай битой строки
+
+                if not filtered_lines:
+                    res = f"*{today}*\nNo entries for interval {interval} min."
+                else:
+                    res = f"```{today}\n" + "\n".join(filtered_lines) + "\n```"
 
             except Exception as e:
-                text = f"*{today}*\nError reading file: `{e}`"
+                res = f"*{today}*\nError reading file: `{e}`"
 
     except Exception as e:
-        text = f"Unexpected error: `{e}`"
+        res = f"Unexpected error: `{e}`"
 
-    await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+    await context.bot.send_message(chat_id=chat_id, text=res, parse_mode='Markdown')
 
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     l_dir = config.log_dir
