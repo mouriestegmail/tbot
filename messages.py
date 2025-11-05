@@ -151,6 +151,11 @@ def create_inventory_log() -> str:
         print(f"except: {e}")
     return "\nNo data"
 
+import re
+from datetime import datetime
+import os
+from telegram.ext import ContextTypes
+
 async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     folder = config.log_dir
     today = datetime.now().strftime("%d.%m.%Y")
@@ -173,15 +178,27 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
                 # убрать лишние пробелы у каждой строки
                 lines = [line.strip() for line in content.splitlines() if line.strip()]
 
-                # фильтруем по интервалу
-
+                # фильтруем по интервал
                 filtered_lines = []
+                prev_value = None
                 for line in lines:
                     try:
-                        time_part = line.split(" - ")[0]  # "11:51 - 295" → "11:51"
+                        time_part, value_part = line.split(" - ")
                         hour, minute = map(int, time_part.split(":"))
-                        if minute % interval == 0:
-                            filtered_lines.append(line)
+                        value = int(value_part)
+
+                        if minute % interval != 0:
+                            continue  # пропускаем строки, не кратные интервалу
+
+                        if prev_value is None:
+                            diff = ""
+                        else:
+                            diff = value - prev_value
+
+
+                        filtered_lines.append(f"{time_part} - {value}{diff}")
+                        prev_value = value
+
                     except Exception:
                         continue  # на случай битой строки
 
@@ -197,6 +214,7 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
         res = f"Unexpected error: `{e}`"
 
     await context.bot.send_message(chat_id=chat_id, text=res, parse_mode='Markdown')
+
 
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     l_dir = config.log_dir
