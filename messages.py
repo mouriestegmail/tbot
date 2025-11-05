@@ -164,8 +164,11 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
         else:
             try:
                 with open(summary_file, "r", encoding="utf-8") as f:
-                    text = f.read().strip()
-                    text = f"```{today}\n {text} \n```"
+                    content = f.read().strip()
+                # убрать лишние пробелы у каждой строки
+                content = "\n".join(line.strip() for line in content.splitlines())
+                text = f"```{today}\n{content}\n```"
+
             except Exception as e:
                 text = f"*{today}*\nError reading file: `{e}`"
 

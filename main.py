@@ -74,7 +74,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     else:
         return None
 
-    await context.bot.send_message(chat_id=chat_id, text=get_last_commit_message())
+    # await context.bot.send_message(chat_id=chat_id, text=get_last_commit_message())
 
     if chat_id == config.martin:
         await context.bot.send_message(chat_id=config.andrei, text=f"Martin say: {text}")
