@@ -196,7 +196,7 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
                             diff = value - prev_value
 
 
-                        filtered_lines.append(f"{time_part} - {value}{diff}")
+                        filtered_lines.append(f"{time_part} - {value}  [{diff}]")
                         prev_value = value
 
                     except Exception:
