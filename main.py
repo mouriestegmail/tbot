@@ -97,6 +97,8 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await make_screenshot(chat_id, context)
     elif "full" in text or "flog" in text:
         await make_log(chat_id, context, full=True)
+    elif "day" in text:
+        await make_day(chat_id, context)
     elif "log" in text:
         integer_value = 20
         try:

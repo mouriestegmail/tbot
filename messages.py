@@ -151,6 +151,28 @@ def create_inventory_log() -> str:
         print(f"except: {e}")
     return "\nNo data"
 
+async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
+    folder = config.log_dir
+    today = datetime.now().strftime("%d.%m.%Y")
+    summary_file = os.path.join(folder, f"{today}_sum.sold")
+
+    text = "try...."
+
+    try:
+        if not os.path.isfile(summary_file):
+            text = f"*{today}*\nNo data for today yet."
+        else:
+            try:
+                with open(summary_file, "r", encoding="utf-8") as f:
+                    text = f.read().strip()
+            except Exception as e:
+                text = f"*{today}*\nError reading file: `{e}`"
+
+    except Exception as e:
+        text = f"Unexpected error: `{e}`"
+
+    await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+
 async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     l_dir = config.log_dir
     current_time = datetime.now()
@@ -246,7 +268,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
                             w = filename[13:15]
                             if w[1] in "13579":
-                                w = "." + w
+                                w = "-" + w
                             else:
                                 w = " " + w
 
