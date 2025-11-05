@@ -191,12 +191,14 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
                             continue  # пропускаем строки, не кратные интервалу
 
                         if prev_value is None:
-                            diff = ""
+                            diff_str = "   "
                         else:
                             diff = value - prev_value
+                            diff_str = f"{diff:+3d}"
 
+                        value_str = f"{value:>4d}"
 
-                        filtered_lines.append(f"{time_part} - {value}  [{diff}]")
+                        filtered_lines.append(f"{time_part} - [{value_str}]  [{diff_str}]")
                         prev_value = value
 
                     except Exception:
