@@ -313,7 +313,7 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
                             w = filename[13:15]
                             if w[1] in "13579":
-                                w = "-" + w
+                                w = w + "_"
                             else:
                                 w = " " + w
 
