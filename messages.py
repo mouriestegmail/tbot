@@ -169,7 +169,8 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
 
     try:
         if not os.path.isfile(summary_file):
-            res = f"*{today}*\nNo data for today yet. \n {summary_file}"
+            print(summary_file)
+            res = f"*{today}*\nNo data for today yet."
         else:
             try:
                 with open(summary_file, "r", encoding="utf-8") as f:
