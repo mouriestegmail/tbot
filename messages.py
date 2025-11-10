@@ -191,7 +191,7 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
                             continue  # пропускаем строки, не кратные интервалу
 
                         if prev_value is None:
-                            diff_str = "   "
+                            diff_str = value
                         else:
                             diff = value - prev_value
                             diff_str = f"{diff:>3d}"
