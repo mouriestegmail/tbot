@@ -158,8 +158,9 @@ from telegram.ext import ContextTypes
 
 async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     folder = config.log_dir
+    floder = folder.replace("log", "sold")
     today = datetime.now().strftime("%d.%m.%Y")
-    summary_file = os.path.join(folder + "/sold", f"{today}_sum.sold")
+    summary_file = os.path.join(folder, f"{today}_sum.sold")
 
     match = re.search(r"\d+", text)
     if match:
