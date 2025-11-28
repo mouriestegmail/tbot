@@ -115,8 +115,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await make_sum(chat_id, context)
 
     elif "setbconf" in text:
-        if config.mode == config.mode_buyer:
-            await set_bconf(chat_id, context, text)
+        await set_bconf(chat_id, context, text)
 
     elif "bconf" in text:
         await make_bconf(chat_id, context)
