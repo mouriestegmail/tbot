@@ -384,6 +384,8 @@ async def make_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     else:
         path = Path("C:/share/worker.json")
 
+    print(path)
+
     if not path.exists():
         await context.bot.send_message(chat_id=chat_id, text="Файл buyer.json не найден.")
         return
