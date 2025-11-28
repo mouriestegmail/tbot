@@ -378,6 +378,12 @@ async def make_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Загрузка buyer.json
     from pathlib import Path
     path = Path("../mnbot/configs/buyer.json")
+
+    if config.mode == config.mode_buyer:
+        path = Path("../mnbot/configs/buyer.json")
+    else:
+        path = Path("C:/share/worker.json")
+
     if not path.exists():
         await context.bot.send_message(chat_id=chat_id, text="Файл buyer.json не найден.")
         return
@@ -389,8 +395,12 @@ async def make_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
-async def set_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE, text="") -> None:
-    fn = "../mnbot/configs/buyer.json"
+async def set_bconf(chat_id,context: ContextTypes.DEFAULT_TYPE, text="") -> None:
+
+    if config.mode == config.mode_buyer:
+        fn = "../mnbot/configs/buyer.json"
+    else:
+        fn = "C:/share/worker.json"
     from pathlib import Path
     path = Path(fn)
 
