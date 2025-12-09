@@ -155,23 +155,31 @@ import re
 from datetime import datetime
 import os
 from telegram.ext import ContextTypes
+from datetime import datetime, timedelta
+
 
 async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     folder = config.log_dir
     folder = folder.replace("log", "sold")
-    today = datetime.now().strftime("%d.%m.%Y")
-    summary_file = os.path.join(folder, f"{today}_sum.sold")
 
-    match = re.search(r"\d+", text)
-    if match:
-        interval = int(match.group())
-    else:
-        interval = 30
+    # text может быть: "day30", "day30 1", "day15 2"
+    parts = text.split()
+
+    # 1. Определяем interval (после "day")
+    match = re.search(r"\d+", parts[0])
+    interval = int(match.group()) if match else 60
+
+    # 2. Определяем, сколько дней назад брать (по умолчанию 0 = сегодня)
+    days_back = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 0
+
+    # 3. Вычисляем дату
+    target_date = (datetime.now() - timedelta(days=days_back)).strftime("%d.%m.%Y")
+    summary_file = os.path.join(folder, f"{target_date}_sum.sold")
 
     try:
         if not os.path.isfile(summary_file):
             print(summary_file)
-            res = f"*{today}*\nNo data for today yet."
+            res = f"*{target_date}*\nNo data for today yet."
         else:
             try:
                 with open(summary_file, "r", encoding="utf-8") as f:
