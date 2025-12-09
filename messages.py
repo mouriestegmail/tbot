@@ -215,12 +215,12 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
                         continue  # на случай битой строки
 
                 if not filtered_lines:
-                    res = f"*{today}*\nNo entries for interval {interval} min."
+                    res = f"*{target_date}*\nNo entries for interval {interval} min."
                 else:
-                    res = f"```{today}\n" + "\n".join(filtered_lines) + "\n```"
+                    res = f"```{target_date}\n" + "\n".join(filtered_lines) + "\n```"
 
             except Exception as e:
-                res = f"*{today}*\nError reading file: `{e}`"
+                res = f"*{target_date}*\nError reading file: `{e}`"
 
     except Exception as e:
         res = f"Unexpected error: `{e}`"
