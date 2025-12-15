@@ -359,6 +359,20 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     await context.bot.send_message(chat_id=chat_id, text=f"free space: {free // (2 ** 30)} GB")
     
+async def make_don(chat_id, context):
+    fn = "C:/share/don/merged.png"
+    try:
+        with open(fn, 'rb') as photo:
+            await context.bot.send_photo(
+                chat_id=chat_id,
+                photo=photo,
+                caption="don"
+            )
+    except:
+        pass
+    await asyncio.sleep(0.5)
+    return None
+
 
 async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 

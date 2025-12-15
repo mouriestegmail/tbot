@@ -81,24 +81,34 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     if "ss" in text:
         await make_ss(chat_id, context, text=text)
-    elif "--" in text or "++" in text:
-        await change_value(chat_id, context, text=text)
+        return None
+    elif "don" in text:
+        await make_don(chat_id, context)
+        return None
     elif "get" in text:
         await make_get_file(chat_id=chat_id, context=context, text=text)
+        return None
     elif "file" in text:
         await make_files(chat_id, context)
+        return None
     elif "fn" in text:
         await make_fn(chat_id, context, text=text)
+        return None
     elif "time" in text:
         await make_time(chat_id, context)
+        return None
     elif "fshot" in text:
         await make_screenshot(chat_id, context, full=True)
+        return None
     elif "shot" in text:
         await make_screenshot(chat_id, context)
+        return None
     elif "full" in text or "flog" in text:
         await make_log(chat_id, context, full=True)
+        return None
     elif "day" in text:
         await make_day(chat_id, context, text=text)
+        return None
     elif "log" in text:
         integer_value = 20
         try:
@@ -106,37 +116,47 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         except ValueError:
             pass
         await make_log(chat_id, context, count=integer_value,text=text)
+        return None
     elif "comm" in text:
         print(text)
         await create_command(chat_id, context, text)
+        return None
     elif "sum" in text:
         # await make_log(chat_id, context, count=5)
         # await make_money(chat_id, context)
         await make_sum(chat_id, context)
+        return None
 
     elif "setbconf" in text:
         await set_bconf(chat_id, context, text)
+        return None
 
     elif "bconf" in text:
         await make_bconf(chat_id, context)
+        return None
 
 
     elif "setconf" in text:
         if config.mode == config.mode_worker:
             await set_conf(chat_id, context, text)
+            return None
         else:
             await set_conf_buyer(chat_id, context, text)
+            return None
     elif "conf" in text:
         if config.mode == config.mode_worker:
             await make_conf(chat_id, context)
+            return None
         else:
             await make_conf_buyer(chat_id, context)
+            return None
 
     elif "history" in text:
         await make_history(chat_id, context)
+        return None
     else:
         if chat_id not in config.users:
-            return
+            return None
         text = """ss    - shot from workers [ss w1]
 get   - get file      [get w1.ah]
 file  - get tree of files 
@@ -150,6 +170,8 @@ history - 14 day history
         """
         text = "```help\n" + text + "\n```"
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+        return None
+
 
 # Запуск дочернего скрипта
 #child = subprocess.Popen(
