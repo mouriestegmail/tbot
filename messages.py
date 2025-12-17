@@ -228,7 +228,7 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     await context.bot.send_message(chat_id=chat_id, text=res, parse_mode='Markdown')
 
 
-async def make_sum(chat_id, bot) -> None:
+def make_sum(chat_id) -> None:
     l_dir = config.log_dir
     current_time = datetime.now()
     text = "ПРОДАНО:\n{"
@@ -352,12 +352,25 @@ async def make_sum(chat_id, bot) -> None:
 
     text = re.sub(r"z:(\d+)", r"'\1'", text)
 
-    await bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
     import shutil
 
     total, used, free = shutil.disk_usage("C:\\")
 
-    await bot.send_message(chat_id=chat_id, text=f"free space: {free // (2 ** 30)} GB")
+    text += f"\n free space: {free // (2 ** 30)} GB\n"
+
+    fn = config.watch_dir + f"/{chat_id}."
+    tmp = fn + "tmp"
+    reply = fn + "reply"
+
+    with open(tmp, 'w', encoding="utf-8") as f:
+        f.write(text)
+    os.replace(tmp, reply)
+
+
+    # await bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+
+
+    # await bot.send_message(chat_id=chat_id, text=f"free space: {free // (2 ** 30)} GB")
     
 async def make_don(chat_id, context):
     fn = "C:/share/don/merged.png"
@@ -825,7 +838,7 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
 
     return None
 
-async def make_log_input(bot, chat_id, text, count, full, attempt=3):
+async def make_log(bot, chat_id, text, count, full, attempt=3):
     l_dir = config.log_dir
     current_time = datetime.now()
     filename = l_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
@@ -861,54 +874,13 @@ async def make_log_input(bot, chat_id, text, count, full, attempt=3):
                 await bot.send_message(chat_id=chat_id, text=f"file open error {filename} {e}")
             else:
                 await bot.send_message(chat_id=chat_id, text=f"attempt = {attempt}")
-                await make_log_input(bot, chat_id, text, count, full, attempt)
+                await make_log(bot, chat_id, text, count, full, attempt)
     else:
         try:
             with open(filename, 'rb') as text_file:
                 await bot.send_document(chat_id=chat_id, document=text_file, filename='full.log')
         except Exception as e:
             await bot.send_message(chat_id=chat_id, text=f"file send error {filename}")
-
-async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, *, count=30, text: str = "", full=False) -> None:
-    l_dir = config.log_dir
-    current_time = datetime.now()
-    filename = l_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
-    print(filename)
-
-    grep = None
-    l_text = text.split(" ")
-    if len(l_text) == 2:
-        grep = l_text[1].lower()
-
-    if not full:
-        return
-
-
-        try:
-            with open(filename, 'r', encoding='utf-8') as file:
-                lines = file.readlines()
-
-            if grep:
-                filtered = [line for line in lines if grep in line.lower()]
-                text_to_send = "".join(filtered[-count:])
-            else:
-                text_to_send = "".join(lines[-count:])
-
-            text_to_send = "```log\n" + text_to_send + "\n```"
-            fn = config.watch_dir +  f"/{chat_id}.{int(time.time())}."
-            tmp = fn+"tmp"
-            reply = fn+"reply"
-            with open(tmp, 'w', encoding="utf-8") as f:
-                f.write(text_to_send)
-            os.replace(tmp, reply)
-        except Exception as e:
-            await context.bot.send_message(chat_id=chat_id, text=f"file open error {filename} {e}")
-    else:
-        try:
-            with open(filename, 'rb') as text_file:
-                await context.bot.send_document(chat_id=chat_id, document=text_file, filename='full.log')
-        except Exception as e:
-            await context.bot.send_message(chat_id=chat_id, text=f"file send error {filename}")
 
 async def make_get_file(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     l_dir = config.log_dir

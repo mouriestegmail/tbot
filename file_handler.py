@@ -85,6 +85,13 @@ class NewFileHandler(FileSystemEventHandler):
             filepath.unlink()
             return
 
+        elif self.is_reply_file(filepath):
+            chat_id_str = filepath.stem
+            print(chat_id_str)
+            text = filepath.read_text(encoding="utf-8")
+            chat_id = int(chat_id_str)
+            await self.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+
         if name.startswith(".#"):
             print(1)
             return
@@ -115,22 +122,24 @@ class NewFileHandler(FileSystemEventHandler):
 
     async def read_input_file(self, text, chat_id):
         if "flog" in text:
-            await messages.make_log_input(chat_id=chat_id, bot=self.bot, count=0, text="", full=True)
+            await messages.make_log(chat_id=chat_id, bot=self.bot, count=0, text="", full=True)
         elif "log" in text:
             integer_value = 20
             try:
                 integer_value = int(''.join(re.findall(r'\d+', text)))
             except ValueError:
                 pass
-            await messages.make_log_input(chat_id=chat_id, bot=self.bot, count=integer_value, text=text, full=False)
+            await messages.make_log(chat_id=chat_id, bot=self.bot, count=integer_value, text=text, full=False)
         elif "sum" in text:
-            await messages.make_sum(chat_id=chat_id, bot=self.bot)
+            messages.make_sum(chat_id=chat_id)
 
         return None
 
     def is_input_file(self, file: Path):
         return file.suffix.lower() in ".input"
 
+    def is_reply_file(self, file: Path):
+        return file.suffix.lower() in ".reply"
 
     def is_img_file(self, file: Path) -> bool:
         return file.suffix.lower() in (".png", ".jpg", ".jpeg")
