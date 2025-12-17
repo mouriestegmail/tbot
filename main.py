@@ -79,6 +79,14 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if chat_id == config.martin:
         await context.bot.send_message(chat_id=config.andrei, text=f"Martin say: {text}")
 
+    fn = config.watch_dir + f"/{chat_id}."
+    tmp = fn + "tmp"
+    reply = fn + "input"
+    with open(tmp, 'w', encoding="utf-8") as f:
+        f.write(text)
+    os.replace(tmp, reply)
+
+
     if "ss" in text:
         await make_ss(chat_id, context, text=text)
         return None
@@ -103,20 +111,11 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif "shot" in text:
         await make_screenshot(chat_id, context)
         return None
-    elif "full" in text or "flog" in text:
-        await make_log(chat_id, context, full=True)
-        return None
+
     elif "day" in text:
         await make_day(chat_id, context, text=text)
         return None
-    elif "log" in text:
-        integer_value = 20
-        try:
-            integer_value = int(''.join(re.findall(r'\d+', text)))
-        except ValueError:
-            pass
-        await make_log(chat_id, context, count=integer_value,text=text)
-        return None
+
     elif "comm" in text:
         print(text)
         await create_command(chat_id, context, text)

@@ -5,6 +5,7 @@ from pathlib import Path
 import asyncio
 import os
 import time
+import re
 # from datetime import datetime
 
 import config
@@ -60,6 +61,7 @@ class NewFileHandler(FileSystemEventHandler):
         print(filepath)
 
         if self.is_input_file(filepath):
+
             chat_id = None
             try:
                 # chat_id — первая часть имени файла
@@ -68,7 +70,7 @@ class NewFileHandler(FileSystemEventHandler):
                 text = filepath.read_text(encoding="utf-8")
                 chat_id = int(chat_id_str)
 
-                await messages.make_log_input(self.bot, text=text, chat_id=chat_id)
+                await self.read_input_file(text, chat_id)
 
             except Exception as e:
                 print(f"[Error notify] {e}")
@@ -111,6 +113,18 @@ class NewFileHandler(FileSystemEventHandler):
             print("else")
             await self.bot.send_message(chat_id=config.bot_connect_group, text=f"Появился файл: {name}", disable_notification=is_mute)
 
+    async def read_input_file(self, text, chat_id):
+        if "flog" in text:
+            await messages.make_log_input(chat_id=chat_id, bot=self.bot, count=0, text="", full=True)
+        if "log" in text:
+            integer_value = 20
+            try:
+                integer_value = int(''.join(re.findall(r'\d+', text)))
+            except ValueError:
+                pass
+            await messages.make_log_input(chat_id=chat_id, bot=self.bot, count=integer_value, text=text, full=False)
+
+        return None
 
     def is_input_file(self, file: Path):
         return file.suffix.lower() in ".input"
