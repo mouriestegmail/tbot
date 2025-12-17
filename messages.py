@@ -825,7 +825,7 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
 
     return None
 
-async def make_log_input(bot, chat_id, text, count, full):
+async def make_log_input(bot, chat_id, text, count, full, attempt=3):
     l_dir = config.log_dir
     current_time = datetime.now()
     filename = l_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
@@ -856,7 +856,10 @@ async def make_log_input(bot, chat_id, text, count, full):
             )
 
         except Exception as e:
-            await bot.send_message(chat_id=chat_id, text=f"file open error {filename} {e}")
+            attempt -= 1
+            if attempt == 0:
+                await bot.send_message(chat_id=chat_id, text=f"file open error {filename} {e}")
+            await make_log_input(bot, chat_id, text, count, full, attempt)
     else:
         try:
             with open(filename, 'rb') as text_file:
