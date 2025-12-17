@@ -15,6 +15,21 @@ class NewFileHandler(FileSystemEventHandler):
         self.bot = bot
         self.loop = loop  # loop Telegram Application'а
 
+    def on_moved(self, event):
+        if event.is_directory:
+            return
+        if not event.dest_path.endswith(".reply"):
+            return
+
+        fut = asyncio.run_coroutine_threadsafe(
+            self.notify(event.dest_path),
+            self.loop
+        )
+        try:
+            fut.result()
+        except Exception as e:
+            print(f"[Ошибка notify] {e}")
+
     def on_created(self, event):
         if event.is_directory:
             return  # игнорируем директории
