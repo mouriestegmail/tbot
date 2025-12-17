@@ -16,15 +16,22 @@ class NewFileHandler(FileSystemEventHandler):
         self.loop = loop  # loop Telegram Application'а
 
     def on_created(self, event):
-        if not event.is_directory:
-            fut = asyncio.run_coroutine_threadsafe(
-                self.notify(event.src_path),
-                self.loop
-            )
-            try:
-                fut.result()  # ⬅️ добавлено: покажет ошибку прямо в консоли
-            except Exception as e:
-                print(f"[Ошибка в notify] {e}")
+        if event.is_directory:
+            return  # игнорируем директории
+
+        # Игнорируем временные файлы *.tmp
+        if event.src_path.endswith(".tmp"):
+            return
+
+        # запускаем корутину в loop
+        fut = asyncio.run_coroutine_threadsafe(
+            self.notify(event.src_path),
+            self.loop
+        )
+        try:
+            fut.result()  # ⬅️ покажет ошибку прямо в консоли
+        except Exception as e:
+            print(f"[Ошибка в notify] {e}")
 
     async def notify(self, filepath):
         filepath = Path(filepath)  # ← вот это добавь
@@ -33,6 +40,32 @@ class NewFileHandler(FileSystemEventHandler):
         is_mute = "mute" in name
 
         print(filepath)
+
+        if self.is_reply_file(filepath):
+            chat_id = None
+            try:
+                # chat_id — первая часть имени файла
+                chat_id_str = filepath.stem.split(".", 1)[0]
+                chat_id = int(chat_id_str)
+
+                text_to_send = filepath.read_text(encoding="utf-8")
+                await self.bot.send_message(
+                    chat_id=chat_id,
+                    text=text_to_send,
+                    parse_mode='Markdown'
+                )
+            except Exception as e:
+                print(f"[Error notify] {e}")
+                if chat_id is None:
+                    return
+                await self.bot.send_message(
+                    chat_id=chat_id,
+                    text=e,
+                    parse_mode='Markdown'
+                )
+
+            filepath.unlink()
+            return
 
         if name.startswith(".#"):
             print(1)
@@ -61,6 +94,8 @@ class NewFileHandler(FileSystemEventHandler):
         else:
             print("else")
             await self.bot.send_message(chat_id=config.bot_connect_group, text=f"Появился файл: {name}", disable_notification=is_mute)
+    def is_reply_file(self, file: Path):
+        return file.suffix.lower() in ".reply"
 
     def is_img_file(self, file: Path) -> bool:
         return file.suffix.lower() in (".png", ".jpg", ".jpeg")

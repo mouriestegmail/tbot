@@ -849,7 +849,12 @@ async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, *, count=30, tex
                 text_to_send = "".join(lines[-count:])
 
             text_to_send = "```log\n" + text_to_send + "\n```"
-            await context.bot.send_message(chat_id=chat_id, text=text_to_send, parse_mode='Markdown')
+            fn = config.watch_dir +  f"/{chat_id}.{time.time()}."
+            tmp = fn+"tmp"
+            reply = fn+"reply"
+            with open(tmp, 'w', encoding="utf-8") as f:
+                f.write(text_to_send)
+            os.replace(tmp, reply)
         except Exception as e:
             await context.bot.send_message(chat_id=chat_id, text=f"file open error {filename} {e}")
     else:
