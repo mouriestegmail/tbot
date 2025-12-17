@@ -849,7 +849,7 @@ async def make_log(chat_id, context: ContextTypes.DEFAULT_TYPE, *, count=30, tex
                 text_to_send = "".join(lines[-count:])
 
             text_to_send = "```log\n" + text_to_send + "\n```"
-            fn = config.watch_dir +  f"/{chat_id}.{time.time()}."
+            fn = config.watch_dir +  f"/{chat_id}.{int(time.time())}."
             tmp = fn+"tmp"
             reply = fn+"reply"
             with open(tmp, 'w', encoding="utf-8") as f:
