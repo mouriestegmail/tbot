@@ -21,8 +21,6 @@ class NewFileHandler(FileSystemEventHandler):
         print("on_moved", event.dest_path)
         if event.is_directory:
             return
-        if not event.dest_path.endswith(".input"):
-            return
 
         fut = asyncio.run_coroutine_threadsafe(
             self.notify(event.dest_path),
