@@ -31,7 +31,7 @@ class NewFileHandler(FileSystemEventHandler):
         try:
             fut.result()
         except Exception as e:
-            print(f"[Ошибка notify] {e}")
+            print(f"[Ошибка notify moved] {e}")
 
     def on_created(self, event):
         print("on_created", event.src_path)
@@ -123,7 +123,7 @@ class NewFileHandler(FileSystemEventHandler):
             except ValueError:
                 pass
             await messages.make_log_input(chat_id=chat_id, bot=self.bot, count=integer_value, text=text, full=False)
-        elif sum in text:
+        elif "sum" in text:
             await messages.make_sum(chat_id=chat_id, bot=self.bot)
 
         return None
