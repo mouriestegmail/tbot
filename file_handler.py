@@ -17,6 +17,7 @@ class NewFileHandler(FileSystemEventHandler):
         self.loop = loop  # loop Telegram Application'а
 
     def on_moved(self, event):
+        print("on_moved", event.dest_path)
         if event.is_directory:
             return
         if not event.dest_path.endswith(".reply"):
@@ -32,6 +33,7 @@ class NewFileHandler(FileSystemEventHandler):
             print(f"[Ошибка notify] {e}")
 
     def on_created(self, event):
+        print("on_created", event.src_path)
         if event.is_directory:
             return  # игнорируем директории
 
