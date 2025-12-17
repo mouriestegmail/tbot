@@ -116,7 +116,7 @@ class NewFileHandler(FileSystemEventHandler):
     async def read_input_file(self, text, chat_id):
         if "flog" in text:
             await messages.make_log_input(chat_id=chat_id, bot=self.bot, count=0, text="", full=True)
-        if "log" in text:
+        elif "log" in text:
             integer_value = 20
             try:
                 integer_value = int(''.join(re.findall(r'\d+', text)))

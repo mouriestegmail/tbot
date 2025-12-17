@@ -86,8 +86,9 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         f.write(text)
     os.replace(tmp, reply)
 
-
-    if "ss" in text:
+    if "log" in text:
+        return None
+    elif "ss" in text:
         await make_ss(chat_id, context, text=text)
         return None
     elif "don" in text:
