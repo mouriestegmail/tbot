@@ -26,10 +26,10 @@ class NewFileHandler(FileSystemEventHandler):
             self.notify(event.dest_path),
             self.loop
         )
-        try:
-            fut.result()
-        except Exception as e:
-            print(f"[Ошибка notify moved] {e}")
+        # try:
+        #     fut.result()
+        # except Exception as e:
+        #     print(f"[Ошибка notify moved] {e}")
 
     def on_created(self, event):
         print("on_created", event.src_path)
@@ -48,10 +48,10 @@ class NewFileHandler(FileSystemEventHandler):
             self.notify(event.src_path),
             self.loop
         )
-        try:
-            fut.result()  # покажет ошибку прямо в консоли
-        except Exception as e:
-            print(f"[Ошибка в notify] {e}")
+        # try:
+        #     fut.result()  # покажет ошибку прямо в консоли
+        # except Exception as e:
+        #     print(f"[Ошибка в notify] {e}")
 
     async def notify(self, filepath):
         filepath = Path(filepath)  # ← вот это добавь
