@@ -130,7 +130,7 @@ class NewFileHandler(FileSystemEventHandler):
                 integer_value = int(''.join(re.findall(r'\d+', text)))
             except ValueError:
                 pass
-            messages.make_log(chat_id=chat_id, bot=self.bot, count=integer_value, text=text, full=False)
+            messages.make_log(chat_id=chat_id, count=integer_value, text=text)
         elif "sum" in text:
             messages.make_sum(chat_id=chat_id)
         elif "day" in text:

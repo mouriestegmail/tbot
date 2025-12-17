@@ -842,7 +842,7 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
 
     return None
 
-def make_log(chat_id, text, count, full, attempt=5):
+def make_log(chat_id, text, count, attempt=5):
     l_dir = config.log_dir
     current_time = datetime.now()
     filename = l_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
@@ -881,7 +881,7 @@ def make_log(chat_id, text, count, full, attempt=5):
         else:
             # await bot.send_message(chat_id=chat_id, text=f"attempt = {attempt}")
             sleep(1)
-            make_log(chat_id, text, count, full, attempt)
+            make_log(chat_id, text, count, attempt)
     fn = config.watch_dir + f"/{chat_id}."
     tmp = fn + "tmp"
     reply = fn + "reply"
