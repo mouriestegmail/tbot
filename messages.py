@@ -228,7 +228,7 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     await context.bot.send_message(chat_id=chat_id, text=res, parse_mode='Markdown')
 
 
-async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def make_sum(chat_id, bot) -> None:
     l_dir = config.log_dir
     current_time = datetime.now()
     text = "ПРОДАНО:\n{"
@@ -352,12 +352,12 @@ async def make_sum(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     text = re.sub(r"z:(\d+)", r"'\1'", text)
 
-    await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+    await bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
     import shutil
 
     total, used, free = shutil.disk_usage("C:\\")
 
-    await context.bot.send_message(chat_id=chat_id, text=f"free space: {free // (2 ** 30)} GB")
+    await bot.send_message(chat_id=chat_id, text=f"free space: {free // (2 ** 30)} GB")
     
 async def make_don(chat_id, context):
     fn = "C:/share/don/merged.png"

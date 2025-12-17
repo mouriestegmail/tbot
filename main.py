@@ -86,7 +86,8 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         f.write(text)
     os.replace(tmp, reply)
 
-    if "log" in text:
+    if "log" in text or \
+        "sum" in text:
         return None
     elif "ss" in text:
         await make_ss(chat_id, context, text=text)
@@ -121,11 +122,11 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         print(text)
         await create_command(chat_id, context, text)
         return None
-    elif "sum" in text:
-        # await make_log(chat_id, context, count=5)
-        # await make_money(chat_id, context)
-        await make_sum(chat_id, context)
-        return None
+    # elif "sum" in text:
+    #     # await make_log(chat_id, context, count=5)
+    #     # await make_money(chat_id, context)
+    #     await make_sum(chat_id, context)
+    #     return None
 
     elif "setbconf" in text:
         await set_bconf(chat_id, context, text)

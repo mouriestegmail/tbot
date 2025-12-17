@@ -123,6 +123,8 @@ class NewFileHandler(FileSystemEventHandler):
             except ValueError:
                 pass
             await messages.make_log_input(chat_id=chat_id, bot=self.bot, count=integer_value, text=text, full=False)
+        elif sum in text:
+            await messages.make_sum(chat_id=chat_id, bot=self.bot)
 
         return None
 
