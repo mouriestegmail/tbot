@@ -838,7 +838,7 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
 
     return None
 
-async def make_log(bot, chat_id, text, count, full, attempt=3):
+def make_log(bot, chat_id, text, count, full, attempt=3):
     l_dir = config.log_dir
     current_time = datetime.now()
     filename = l_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
@@ -846,41 +846,57 @@ async def make_log(bot, chat_id, text, count, full, attempt=3):
 
     grep = None
     l_text = text.split(" ")
-    if not full:
-        if len(l_text) == 2:
-            grep = l_text[1].lower()
 
-        try:
-            with open(filename, 'r', encoding='utf-8') as file:
-                lines = file.readlines()
+    text_to_send = "empty"
+    if len(l_text) == 2:
+        grep = l_text[1].lower()
 
-            if grep:
-                filtered = [line for line in lines if grep in line.lower()]
-                text_to_send = "".join(filtered[-count:])
-            else:
-                text_to_send = "".join(lines[-count:])
+    try:
+        with open(filename, 'r', encoding='utf-8') as file:
+            lines = file.readlines()
 
-            text_to_send = "```log\n" + text_to_send + "\n```"
+        if grep:
+            filtered = [line for line in lines if grep in line.lower()]
+            text_to_send = "".join(filtered[-count:])
+        else:
+            text_to_send = "".join(lines[-count:])
 
-            await bot.send_message(
-                chat_id=chat_id,
-                text=text_to_send,
-                parse_mode='Markdown'
-            )
+        text_to_send = "```log\n" + text_to_send + "\n```"
 
-        except Exception as e:
-            attempt -= 1
-            if attempt == 0:
-                await bot.send_message(chat_id=chat_id, text=f"file open error {filename} {e}")
-            else:
-                await bot.send_message(chat_id=chat_id, text=f"attempt = {attempt}")
-                await make_log(bot, chat_id, text, count, full, attempt)
-    else:
-        try:
-            with open(filename, 'rb') as text_file:
-                await bot.send_document(chat_id=chat_id, document=text_file, filename='full.log')
-        except Exception as e:
-            await bot.send_message(chat_id=chat_id, text=f"file send error {filename}")
+        # await bot.send_message(
+        #     chat_id=chat_id,
+        #     text=text_to_send,
+        #     parse_mode='Markdown'
+        # )
+
+    except Exception as e:
+        attempt -= 1
+        if attempt == 0:
+            text_to_send = "ERRor"
+            # await bot.send_message(chat_id=chat_id, text=f"file open error {filename} {e}")
+        else:
+            # await bot.send_message(chat_id=chat_id, text=f"attempt = {attempt}")
+            make_log(bot, chat_id, text, count, full, attempt)
+    fn = config.watch_dir + f"/{chat_id}."
+    tmp = fn + "tmp"
+    reply = fn + "reply"
+
+    with open(tmp, 'w', encoding="utf-8") as f:
+        f.write(text_to_send)
+    os.replace(tmp, reply)
+
+
+
+async def make_full_log(bot, chat_id):
+    l_dir = config.log_dir
+    current_time = datetime.now()
+    filename = l_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
+    try:
+        with open(filename, 'rb') as text_file:
+            await bot.send_document(chat_id=chat_id, document=text_file, filename='full.log')
+    except Exception as e:
+        await bot.send_message(chat_id=chat_id, text=f"file send error {filename}")
+
 
 async def make_get_file(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     l_dir = config.log_dir

@@ -40,6 +40,9 @@ class NewFileHandler(FileSystemEventHandler):
         if event.src_path.endswith("tmp"):
             return
 
+
+
+
         # запускаем корутину в loop
         fut = asyncio.run_coroutine_threadsafe(
             self.notify(event.src_path),
@@ -120,14 +123,14 @@ class NewFileHandler(FileSystemEventHandler):
 
     async def read_input_file(self, text, chat_id):
         if "flog" in text:
-            await messages.make_log(chat_id=chat_id, bot=self.bot, count=0, text="", full=True)
+            await messages.make_full_log(chat_id=chat_id, bot=self.bot)
         elif "log" in text:
             integer_value = 20
             try:
                 integer_value = int(''.join(re.findall(r'\d+', text)))
             except ValueError:
                 pass
-            await messages.make_log(chat_id=chat_id, bot=self.bot, count=integer_value, text=text, full=False)
+            messages.make_log(chat_id=chat_id, bot=self.bot, count=integer_value, text=text, full=False)
         elif "sum" in text:
             messages.make_sum(chat_id=chat_id)
 
