@@ -39,7 +39,7 @@ class NewFileHandler(FileSystemEventHandler):
             return  # игнорируем директории
 
         # Игнорируем временные файлы *.tmp
-        if event.src_path.endswith(".tmp"):
+        if event.src_path.endswith("tmp"):
             return
 
         # запускаем корутину в loop
@@ -48,7 +48,7 @@ class NewFileHandler(FileSystemEventHandler):
             self.loop
         )
         try:
-            fut.result()  # ⬅️ покажет ошибку прямо в консоли
+            fut.result()  # покажет ошибку прямо в консоли
         except Exception as e:
             print(f"[Ошибка в notify] {e}")
 
