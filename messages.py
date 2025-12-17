@@ -235,7 +235,7 @@ def make_day(chat_id, text) -> None:
     except Exception as e:
         res = f"Unexpected error: `{e}`"
 
-    save_to_reply(chat_id, text)
+    save_to_reply(chat_id, res)
 
 
 def make_sum(chat_id) -> None:
