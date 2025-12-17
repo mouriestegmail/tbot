@@ -859,7 +859,8 @@ async def make_log_input(bot, chat_id, text, count, full, attempt=3):
             attempt -= 1
             if attempt == 0:
                 await bot.send_message(chat_id=chat_id, text=f"file open error {filename} {e}")
-            await make_log_input(bot, chat_id, text, count, full, attempt)
+            else:
+                await make_log_input(bot, chat_id, text, count, full, attempt)
     else:
         try:
             with open(filename, 'rb') as text_file:
