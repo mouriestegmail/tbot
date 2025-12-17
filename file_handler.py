@@ -88,13 +88,12 @@ class NewFileHandler(FileSystemEventHandler):
 
         elif self.is_reply_file(filepath):
             chat_id_str = filepath.stem
-            print(chat_id_str)
             text = filepath.read_text(encoding="utf-8")
             chat_id = int(chat_id_str)
             await self.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+            return
 
         if name.startswith(".#"):
-            print(1)
             return
         if self.is_time_file(str(filepath)):
             print("time")
