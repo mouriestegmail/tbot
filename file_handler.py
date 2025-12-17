@@ -90,8 +90,17 @@ class NewFileHandler(FileSystemEventHandler):
             chat_id_str = filepath.stem
             text = filepath.read_text(encoding="utf-8")
             chat_id = int(chat_id_str)
-            await self.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
-            return
+            for i in 1,2,3,5:
+                try:
+                    await self.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+                    return
+                except Exception as e:
+                    print(f"[Error notify] reply: {e}")
+                    text += f"\n attmpt = {i}"
+                    await asyncio.sleep(i)
+
+
+
 
         if name.startswith(".#"):
             return
