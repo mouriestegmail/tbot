@@ -8,6 +8,7 @@ import time
 # from datetime import datetime
 
 import config
+import messages
 
 
 class NewFileHandler(FileSystemEventHandler):
@@ -56,19 +57,17 @@ class NewFileHandler(FileSystemEventHandler):
 
         print(filepath)
 
-        if self.is_reply_file(filepath):
+        if self.is_input_file(filepath):
             chat_id = None
             try:
                 # chat_id — первая часть имени файла
-                chat_id_str = filepath.stem.split(".", 1)[0]
+                chat_id_str = filepath.stem
+                print(chat_id_str)
+                text = filepath.read_text(encoding="utf-8")
                 chat_id = int(chat_id_str)
 
-                text_to_send = filepath.read_text(encoding="utf-8")
-                await self.bot.send_message(
-                    chat_id=chat_id,
-                    text=text_to_send,
-                    parse_mode='Markdown'
-                )
+                await messages.make_log_input(self.bot, text=text, chat_id=chat_id)
+
             except Exception as e:
                 print(f"[Error notify] {e}")
                 if chat_id is None:
@@ -109,8 +108,11 @@ class NewFileHandler(FileSystemEventHandler):
         else:
             print("else")
             await self.bot.send_message(chat_id=config.bot_connect_group, text=f"Появился файл: {name}", disable_notification=is_mute)
-    def is_reply_file(self, file: Path):
-        return file.suffix.lower() in ".reply"
+
+
+    def is_input_file(self, file: Path):
+        return file.suffix.lower() in ".input"
+
 
     def is_img_file(self, file: Path) -> bool:
         return file.suffix.lower() in (".png", ".jpg", ".jpeg")
