@@ -133,6 +133,8 @@ class NewFileHandler(FileSystemEventHandler):
             messages.make_log(chat_id=chat_id, bot=self.bot, count=integer_value, text=text, full=False)
         elif "sum" in text:
             messages.make_sum(chat_id=chat_id)
+        elif "day" in text:
+            messages.make_day(chat_id, text)
 
         return None
 

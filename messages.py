@@ -6,6 +6,8 @@ from datetime import datetime
 import time
 import pathlib
 import os
+from time import sleep
+
 import config
 import format
 
@@ -157,8 +159,16 @@ import os
 from telegram.ext import ContextTypes
 from datetime import datetime, timedelta
 
+def save_to_reply(chat_id, text):
+    fn = config.watch_dir + f"/{chat_id}."
+    tmp = fn + "tmp"
+    reply = fn + "reply"
 
-async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
+    with open(tmp, 'w', encoding="utf-8") as f:
+        f.write(text)
+    os.replace(tmp, reply)
+
+def make_day(chat_id, text) -> None:
     folder = config.log_dir
     folder = folder.replace("log", "sold")
 
@@ -225,7 +235,7 @@ async def make_day(chat_id, context: ContextTypes.DEFAULT_TYPE, text) -> None:
     except Exception as e:
         res = f"Unexpected error: `{e}`"
 
-    await context.bot.send_message(chat_id=chat_id, text=res, parse_mode='Markdown')
+    save_to_reply(chat_id, text)
 
 
 def make_sum(chat_id) -> None:
@@ -358,13 +368,7 @@ def make_sum(chat_id) -> None:
 
     text += f"\n free space: {free // (2 ** 30)} GB\n"
 
-    fn = config.watch_dir + f"/{chat_id}."
-    tmp = fn + "tmp"
-    reply = fn + "reply"
-
-    with open(tmp, 'w', encoding="utf-8") as f:
-        f.write(text)
-    os.replace(tmp, reply)
+    save_to_reply(chat_id, text)
 
 
     # await bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
@@ -838,7 +842,7 @@ async def change_value(chat_id, context: ContextTypes.DEFAULT_TYPE, text="short_
 
     return None
 
-def make_log(bot, chat_id, text, count, full, attempt=3):
+def make_log(chat_id, text, count, full, attempt=5):
     l_dir = config.log_dir
     current_time = datetime.now()
     filename = l_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
@@ -876,7 +880,8 @@ def make_log(bot, chat_id, text, count, full, attempt=3):
             # await bot.send_message(chat_id=chat_id, text=f"file open error {filename} {e}")
         else:
             # await bot.send_message(chat_id=chat_id, text=f"attempt = {attempt}")
-            make_log(bot, chat_id, text, count, full, attempt)
+            sleep(1)
+            make_log(chat_id, text, count, full, attempt)
     fn = config.watch_dir + f"/{chat_id}."
     tmp = fn + "tmp"
     reply = fn + "reply"

@@ -87,7 +87,9 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     os.replace(tmp, reply)
 
     if "log" in text or \
-        "sum" in text:
+        "sum" in text or \
+        "day" in text \
+        :
         return None
     elif "ss" in text:
         await make_ss(chat_id, context, text=text)
@@ -113,11 +115,6 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif "shot" in text:
         await make_screenshot(chat_id, context)
         return None
-
-    elif "day" in text:
-        await make_day(chat_id, context, text=text)
-        return None
-
     elif "comm" in text:
         print(text)
         await create_command(chat_id, context, text)
