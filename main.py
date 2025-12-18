@@ -178,19 +178,19 @@ async def reaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if getattr(msg, 'reactions', None):
         for r in msg.reactions:
             # Если реакцию поставил владелец (например, ты)
-            if r.user.id == config.MY_USER_ID:
-                print(f"User reacted: {r.type} on message {msg.message_id}")
 
-                # --- Бот ставит такую же реакцию ---
-                try:
-                    await context.bot.set_message_reaction(
-                        chat_id=msg.chat_id,
-                        message_id=msg.message_id,
-                        reaction="✍️"
-                    )
-                    print(f"Bot reacted with {r.type}")
-                except Exception as e:
-                    print(f"[Error bot reaction] {e}")
+            print(f"User reacted: {r.type} on message {msg.message_id}")
+
+            # --- Бот ставит такую же реакцию ---
+            try:
+                await context.bot.set_message_reaction(
+                    chat_id=msg.chat_id,
+                    message_id=msg.message_id,
+                    reaction="✍️"
+                )
+                print(f"Bot reacted with {r.type}")
+            except Exception as e:
+                print(f"[Error bot reaction] {e}")
 # Запуск дочернего скрипта
 #child = subprocess.Popen(
 #    [sys.executable, '../mnbot/parser_png.py'],
