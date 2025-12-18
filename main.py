@@ -171,8 +171,10 @@ history - 14 day history
         return None
 
 async def reaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("1")
     msg = update.edited_message or update.message
     if msg is None:
+        print("2")
         return
 
     if getattr(msg, 'reactions', None):
