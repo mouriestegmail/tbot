@@ -203,7 +203,7 @@ def main() -> None:
     observer.start()
 
     # --- Telegram хэндлеры ---
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    # app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
     app.add_handler(MessageHandler(filters.ALL, reaction_handler))  # ловим edited_message с реакциями
 
     # --- Запуск бота ---
