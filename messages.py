@@ -362,7 +362,7 @@ def make_sum(chat_id) -> None:
 
     text = re.sub(r"z:(\d+)", r"'\1'", text)
 
-    text = re.sub(r"\{:([^,]{0,5}),", lambda m: f"{{:{m.group(1).rjust(6)},", text)  # выравнивает AH max
+    text = re.sub(r"\{:([^,]*),", lambda m: f"{{:{m.group(1).rjust(3)},", text) # выравнивает AH max
 
     import shutil
 
