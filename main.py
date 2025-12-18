@@ -194,6 +194,7 @@ async def reaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await msg.delete()
         print(f"Deleted reply message {msg.message_id}")
     except Exception as e:
+        await context.bot.send_message(chat_id=original.chat_id, text=str(e))
         print(f"[Error reply_handler] {e}")
 
 # --- Main ---
@@ -212,6 +213,7 @@ def main() -> None:
     # --- Telegram хэндлеры ---
     # app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
     app.add_handler(MessageHandler(filters.ALL, reaction_handler))  # ловим edited_message с реакциями
+
 
     # --- Запуск бота ---
     app.run_polling()
