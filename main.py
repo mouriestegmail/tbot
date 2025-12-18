@@ -182,11 +182,12 @@ async def reaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     original = msg.reply_to_message
 
     try:
+        reaction = "✍"
         # Ставим фиксированную реакцию ✍️ на исходное сообщение
         await context.bot.set_message_reaction(
             chat_id=original.chat_id,
             message_id=original.message_id,
-            reaction="✍️"
+            reaction=reaction
         )
         print(f"Bot reacted ✍️ on original message {original.message_id}")
 
