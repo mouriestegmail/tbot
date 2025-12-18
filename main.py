@@ -181,22 +181,37 @@ async def reaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     original = msg.reply_to_message
 
-    try:
-        reaction = "✍"
-        # Ставим фиксированную реакцию ✍️ на исходное сообщение
-        await context.bot.set_message_reaction(
-            chat_id=original.chat_id,
-            message_id=original.message_id,
-            reaction=reaction
-        )
-        print(f"Bot reacted ✍️ on original message {original.message_id}")
+    reaction = "✍"
+    sucsess = 0
+    err_msg = ""
+    for i in range(5):
+    # Ставим фиксированную реакцию ✍️ на исходное сообщение
+        try:
+            await context.bot.set_message_reaction(
+                chat_id=original.chat_id,
+                message_id=original.message_id,
+                reaction=reaction
+            )
+            print(f"Bot reacted ✍️ on original message {original.message_id}")
+            sucsess = 1
+            break
+        except Exception as e:
+            await asyncio.sleep(0.1)
+            err_msg = str(e)
+    if sucsess == 1:
+        for i in range(5):
+            try:
+                # Удаляем reply-сообщение
+                await msg.delete()
+                sucsess = 2
+                break
+            except Exception as e:
+                await asyncio.sleep(0.1)
+                err_msg =str(e)
 
-        # Удаляем reply-сообщение
-        await msg.delete()
-        print(f"Deleted reply message {msg.message_id}")
-    except Exception as e:
+    if sucsess < 2:
         await context.bot.send_message(chat_id=original.chat_id, text=str(e))
-        print(f"[Error reply_handler] {e}")
+        print(f"[Error reply_handler] {err_msg}")
 
 # --- Main ---
 def main() -> None:
