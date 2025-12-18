@@ -89,10 +89,10 @@ class NewFileHandler(FileSystemEventHandler):
         elif self.is_reply_file(filepath):
             chat_id_str = filepath.stem
             text = filepath.read_text(encoding="utf-8")
+            text += f"\nреплай, что бы сохранить \n [{1}]"
             chat_id = int(chat_id_str)
             for i in 2,3,4,5,6:
                 try:
-                    text += f"реплай, что бы сохранить \n [{1}]"
                     await self.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
                     return
                 except Exception as e:
