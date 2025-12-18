@@ -170,7 +170,27 @@ history - 14 day history
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
         return None
 
+async def reaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    msg = update.edited_message or update.message
+    if msg is None:
+        return
 
+    if getattr(msg, 'reactions', None):
+        for r in msg.reactions:
+            # Если реакцию поставил владелец (например, ты)
+            if r.user.id == config.MY_USER_ID:
+                print(f"User reacted: {r.type} on message {msg.message_id}")
+
+                # --- Бот ставит такую же реакцию ---
+                try:
+                    await context.bot.set_message_reaction(
+                        chat_id=msg.chat_id,
+                        message_id=msg.message_id,
+                        reaction="✍️"
+                    )
+                    print(f"Bot reacted with {r.type}")
+                except Exception as e:
+                    print(f"[Error bot reaction] {e}")
 # Запуск дочернего скрипта
 #child = subprocess.Popen(
 #    [sys.executable, '../mnbot/parser_png.py'],
@@ -180,14 +200,6 @@ history - 14 day history
 
 
 def main() -> None:
-
-
-    # content = os.listdir(messages.prison_dir)
-    # set_folders_prison = set([folder for folder in content if os.path.isdir(os.path.join(messages.prison_dir, folder))])
-    #
-    # content = os.listdir(messages.except_dir)
-    # set_folders_except = set([folder for folder in content if os.path.isfile(os.path.join(messages.except_dir, folder))])
-
     app = Application.builder().token(config.token).build()
 
     loop = asyncio.get_event_loop()
@@ -199,6 +211,7 @@ def main() -> None:
     observer.start()
 
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    app.add_handler(MessageHandler(filters.ALL, reaction_handler))
     app.run_polling()
 
 

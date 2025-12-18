@@ -92,7 +92,7 @@ class NewFileHandler(FileSystemEventHandler):
             chat_id = int(chat_id_str)
             for i in 2,3,4,5,6:
                 try:
-                    text += f"\n поставь лайк, если хочешь сохранить сообщение \n {1}"
+                    text += f"лайк, если хочешь сохранить сообщение \n {1}"
                     await self.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
                     return
                 except Exception as e:
