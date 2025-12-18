@@ -174,22 +174,27 @@ history - 14 day history
 async def reaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(1)
     print(update)
-    await echo(update, context)
-    msg = getattr(update, "edited_message", None)
-    if msg is None or not getattr(msg, "reactions", None):
+    msg = update.message
+    if msg is None or msg.reply_to_message is None:
+        await echo(update, context)
         return
 
+    original = msg.reply_to_message
+
     try:
-        # Бот всегда ставит ✍️
+        # Ставим фиксированную реакцию ✍️ на исходное сообщение
         await context.bot.set_message_reaction(
-            chat_id=msg.chat_id,
-            message_id=msg.message_id,
+            chat_id=original.chat_id,
+            message_id=original.message_id,
             reaction="✍️"
         )
-        # protected_messages.add(msg.message_id)
-        print(f"Bot reacted ✍️ on message {msg.message_id}")
+        print(f"Bot reacted ✍️ on original message {original.message_id}")
+
+        # Удаляем reply-сообщение
+        await msg.delete()
+        print(f"Deleted reply message {msg.message_id}")
     except Exception as e:
-        print(f"[Error bot reaction] {e}")
+        print(f"[Error reply_handler] {e}")
 
 # --- Main ---
 def main() -> None:
