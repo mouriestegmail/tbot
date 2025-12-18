@@ -173,6 +173,8 @@ history - 14 day history
 
 async def reaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(1)
+    print(update)
+    await echo(update, context)
     msg = getattr(update, "edited_message", None)
     if msg is None or not getattr(msg, "reactions", None):
         return
