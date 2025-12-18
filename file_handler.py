@@ -92,12 +92,11 @@ class NewFileHandler(FileSystemEventHandler):
             chat_id = int(chat_id_str)
             for i in 2,3,4,5,6:
                 try:
-                    text += f"лайк, если хочешь сохранить сообщение \n {1}"
+                    text += f"реплай, что бы сохранить \n [{1}]"
                     await self.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
                     return
                 except Exception as e:
-                    print(f"[Error notify] reply: {e}")
-                    text += f"-> {i}"
+                    text += f"-> [{i}]"
                     await asyncio.sleep(0.5)
 
 
