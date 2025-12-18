@@ -170,41 +170,30 @@ history - 14 day history
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
         return None
 
+
 async def reaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print("1")
-    msg = update.edited_message or update.message
-    if msg is None:
-        print("2")
+    msg = getattr(update, "edited_message", None)
+    if msg is None or not getattr(msg, "reactions", None):
         return
 
-    if getattr(msg, 'reactions', None):
-        for r in msg.reactions:
-            # Если реакцию поставил владелец (например, ты)
+    try:
+        # Бот всегда ставит ✍️
+        await context.bot.set_message_reaction(
+            chat_id=msg.chat_id,
+            message_id=msg.message_id,
+            reaction="✍️"
+        )
+        # protected_messages.add(msg.message_id)
+        print(f"Bot reacted ✍️ on message {msg.message_id}")
+    except Exception as e:
+        print(f"[Error bot reaction] {e}")
 
-            print(f"User reacted: {r.type} on message {msg.message_id}")
-
-            # --- Бот ставит такую же реакцию ---
-            try:
-                await context.bot.set_message_reaction(
-                    chat_id=msg.chat_id,
-                    message_id=msg.message_id,
-                    reaction="✍️"
-                )
-                print(f"Bot reacted with {r.type}")
-            except Exception as e:
-                print(f"[Error bot reaction] {e}")
-# Запуск дочернего скрипта
-#child = subprocess.Popen(
-#    [sys.executable, '../mnbot/parser_png.py'],
-#    preexec_fn=os.setsid if os.name != 'nt' else None,  # только на Unix
-#    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
-#)
-
-
+# --- Main ---
 def main() -> None:
     app = Application.builder().token(config.token).build()
-
     loop = asyncio.get_event_loop()
+
+    # --- Watchdog ---
     observer = Observer()
     print(f"watch dir: {config.watch_dir}")
     observer.schedule(file_handler.NewFileHandler(app.bot, loop),
@@ -212,9 +201,14 @@ def main() -> None:
                       recursive=False)
     observer.start()
 
+    # --- Telegram хэндлеры ---
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
-    app.add_handler(MessageHandler(filters.ALL, reaction_handler))
+    app.add_handler(MessageHandler(filters.ALL, reaction_handler))  # ловим edited_message с реакциями
+
+    # --- Запуск бота ---
     app.run_polling()
+
+
 
 
 
