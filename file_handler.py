@@ -123,8 +123,11 @@ class NewFileHandler(FileSystemEventHandler):
                     del_dir = "./delete_file/"
                     if flag_delete:
                         fn = f"{del_dir}{msg.message_id}.del"
-                        open(fn, 'w', encoding="utf-8")
-                        # удалим этот файл по реплаю
+                        try:
+                            with open(fn, 'w', encoding="utf-8"):
+                                pass  # создаём пустой файл
+                        except Exception as e:
+                            print(f"[Error creating delete file] {e}")
 
                     now = time.time()
                     intervale = 5 * 60
