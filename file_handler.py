@@ -87,20 +87,55 @@ class NewFileHandler(FileSystemEventHandler):
             return
 
         elif self.is_reply_file(filepath):
-            chat_id_str = filepath.stem
+
+            list_attr = filepath.stem.split(".")
+            i = 0
+
+            flag_delete = False
+            flag_mute = True
+            chat_id_str = None
+
+
+            for attr in list_attr:
+                if i == 0:
+                    chat_id_str = filepath.stem
+                if i == 1:
+                    pass # all message is text. yet
+                if i == 2:
+                    flag_delete = attr == "del"
+                if i == 3:
+                    flag_mute = attr == "mute"
+                i += 1
+
+            if chat_id_str is None:
+                return
+
             text = filepath.read_text(encoding="utf-8")
-            text += f"\nреплай, что бы сохранить \n [{1}]"
+            text += f"\nреплай, что бы сохранить \n >"
             chat_id = int(chat_id_str)
             for i in 2,3,4,5,6:
                 try:
-                    await self.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
+                    msg = await self.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown', disable_notification=flag_mute)
+                    del_dir = "./delete_file/"
+                    if flag_delete:
+                        fn = f"{del_dir}{msg.message_id}.del"
+                        open(fn, 'w', encoding="utf-8")
+                        # удалим этот файл по реплаю
+
+                    now = time.time()
+                    intervale = 5 * 60
+                    for f in os.listdir(del_dir):
+                        path = Path(del_dir) / f
+                        if not path.is_file():
+                            continue
+
+                        if now - path.stat().st_mtime > intervale:
+                            path.unlink()
+
                     return
                 except Exception as e:
-                    text += f"-> [{i}]"
+                    text += ">"*i
                     await asyncio.sleep(0.5)
-
-
-
 
         if name.startswith(".#"):
             return

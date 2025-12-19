@@ -159,8 +159,22 @@ import os
 from telegram.ext import ContextTypes
 from datetime import datetime, timedelta
 
-def save_to_reply(chat_id, text):
+def save_to_reply(chat_id, text, type="text", delete_flag:bool=False,mute_flag:bool=True):
     fn = config.watch_dir + f"/{chat_id}."
+
+    if type == "text":
+        fn+="text."
+    else:
+        fn+="unknown."
+    if delete_flag:
+        fn += "del."
+    else:
+        fn += "undel."
+    if mute_flag:
+        fn += "mute."
+    else:
+        fn += "unmute."
+
     tmp = fn + "tmp"
     reply = fn + "reply"
 
@@ -234,8 +248,7 @@ def make_day(chat_id, text) -> None:
 
     except Exception as e:
         res = f"Unexpected error: `{e}`"
-
-    save_to_reply(chat_id, res)
+    save_to_reply(chat_id, res, type="text", delete_flag=True, mute_flag=True)
 
 
 def make_sum(chat_id) -> None:
@@ -370,7 +383,7 @@ def make_sum(chat_id) -> None:
 
     text += f"\n free space: {free // (2 ** 30)} GB\n"
 
-    save_to_reply(chat_id, text)
+    save_to_reply(chat_id, text, type="text", delete_flag=True, mute_flag=True)
 
 
     # await bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
@@ -884,13 +897,10 @@ def make_log(chat_id, text, count, attempt=5):
             # await bot.send_message(chat_id=chat_id, text=f"attempt = {attempt}")
             sleep(1)
             make_log(chat_id, text, count, attempt)
-    fn = config.watch_dir + f"/{chat_id}."
-    tmp = fn + "tmp"
-    reply = fn + "reply"
 
-    with open(tmp, 'w', encoding="utf-8") as f:
-        f.write(text_to_send)
-    os.replace(tmp, reply)
+
+    save_to_reply(chat_id, text, type="text", delete_flag=True, mute_flag=True)
+
 
 
 
