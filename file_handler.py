@@ -132,7 +132,7 @@ class NewFileHandler(FileSystemEventHandler):
                     now = time.time()
                     intervale = 5 * 60
                     for f in os.listdir(del_dir):
-                        path = Path(del_dir) / f
+                        path = Path(del_dir + "/" + f)
                         if not path.is_file():
                             continue
 
