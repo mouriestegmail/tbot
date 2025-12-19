@@ -192,8 +192,9 @@ async def reaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 message_id=original.message_id,
                 reaction=reaction
             )
+            del_dir = "./delete_msg/"
+            fn = f"{del_dir}{original.message_id}.{original.chat_id}.del"
 
-            fn = f"./delete_msg/{original.chat_id}.del"
             try:
                 os.remove(fn)
             except Exception as e:
