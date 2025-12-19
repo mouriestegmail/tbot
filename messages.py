@@ -899,7 +899,7 @@ def make_log(chat_id, text, count, attempt=5):
             make_log(chat_id, text, count, attempt)
 
 
-    save_to_reply(chat_id, text, type="text", delete_flag=True, mute_flag=True)
+    save_to_reply(chat_id, text_to_send, type="text", delete_flag=True, mute_flag=True)
 
 
 
