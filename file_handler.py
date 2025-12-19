@@ -156,11 +156,9 @@ class NewFileHandler(FileSystemEventHandler):
                             finally:
                                 path.unlink()
 
-                            path.unlink()
-
                     return
                 except Exception as e:
-                    text += ">"*i
+                    text += " "+">"*i
                     await asyncio.sleep(0.5)
 
         if name.startswith(".#"):
