@@ -120,7 +120,7 @@ class NewFileHandler(FileSystemEventHandler):
             for i in 2,3,4,5,6:
                 try:
                     msg = await self.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown', disable_notification=flag_mute)
-                    del_dir = "./delete_file/"
+                    del_dir = "./delete_msg/"
                     if flag_delete:
                         fn = f"{del_dir}{msg.message_id}.del"
                         try:
