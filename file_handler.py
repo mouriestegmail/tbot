@@ -93,7 +93,7 @@ class NewFileHandler(FileSystemEventHandler):
 
             flag_delete = False
             flag_mute = True
-            chat_id_str = None
+            chat_id_str = ""
 
 
             for attr in list_attr:
@@ -107,8 +107,12 @@ class NewFileHandler(FileSystemEventHandler):
                     flag_mute = attr == "mute"
                 i += 1
 
-            if chat_id_str is None:
+            print(chat_id_str, flag_delete, flag_mute, i)
+
+            if chat_id_str == "":
                 return
+
+            print(12345)
 
             text = filepath.read_text(encoding="utf-8")
             text += f"\nреплай, что бы сохранить \n >"
