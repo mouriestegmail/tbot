@@ -192,6 +192,13 @@ async def reaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 message_id=original.message_id,
                 reaction=reaction
             )
+
+            fn = f"./delete_msg/{original.chat_id}.del"
+            try:
+                os.remove(fn)
+            except Exception as e:
+                pass
+
             print(f"Bot reacted ✍️ on original message {original.message_id}")
             sucsess = 1
             break
