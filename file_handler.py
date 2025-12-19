@@ -122,7 +122,7 @@ class NewFileHandler(FileSystemEventHandler):
                     msg = await self.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown', disable_notification=flag_mute)
                     del_dir = "./delete_msg/"
                     if flag_delete:
-                        fn = f"{del_dir}{msg.message_id}.del"
+                        fn = f"{del_dir}{msg.message_id}.{chat_id}.del"
                         try:
                             with open(fn, 'w', encoding="utf-8"):
                                 pass  # создаём пустой файл
@@ -137,6 +137,25 @@ class NewFileHandler(FileSystemEventHandler):
                             continue
 
                         if now - path.stat().st_mtime > intervale:
+                            try:
+                                # имя файла: message_id.chat_id.del
+                                name = path.stem  # "12345.67890"
+                                msg_id_str, chat_id_str = name.split(".", 1)
+
+                                msg_id = int(msg_id_str)
+                                chat_id = int(chat_id_str)
+
+                                await self.bot.delete_message(
+                                    chat_id=chat_id,
+                                    message_id=msg_id
+                                )
+
+                            except Exception as e:
+                                print(f"[Error delete message] {e}")
+
+                            finally:
+                                path.unlink()
+
                             path.unlink()
 
                     return
