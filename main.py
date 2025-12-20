@@ -177,6 +177,7 @@ async def reaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.message
     if msg is None or msg.reply_to_message is None:
         await echo(update, context)
+        # await context.bot.deleteMessage(update.message.chat_id, update.message.id)
         return
 
     original = msg.reply_to_message

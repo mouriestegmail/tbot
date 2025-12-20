@@ -861,6 +861,8 @@ def make_log(chat_id, text, count, attempt=5):
     l_dir = config.log_dir
     current_time = datetime.now()
     filename = l_dir + f'/log_{current_time.strftime("%d.%m.%Y")}.log'
+    if "logc" in text:
+        filename = "C:/Celestian/Beta 1.16.5/logs/latest"
     print(filename)
 
     grep = None
