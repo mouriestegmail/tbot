@@ -316,7 +316,7 @@ def make_sum(chat_id) -> None:
                         last_modified_time = os.path.getmtime(filename)
                         current_time = time.time()
                         h = datetime.now().hour
-                        delta_t = 60 * 5
+                        delta_t = 60 * 10
                         if 1 < h < 9:
                             delta_t = 60 * 30
 
