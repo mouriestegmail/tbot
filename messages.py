@@ -45,6 +45,17 @@ def format_text(text):
     text = text.replace('pob', 'p')
     text = text.replace('ser', 's')
     text = text.replace('kil', 'k')
+
+    #eval("{'ass':0, 'gnv':0, 'hlp':0, 'rad':0,'sno':0 , 'svt':0}")
+    text = text.replace('ass', 'as')
+    text = text.replace('gnv', 'gn')
+    text = text.replace('hlp', 'hl')
+    text = text.replace('rad', 'rd')
+    text = text.replace('sno', 'sn')
+    text = text.replace('svt', 'sv')
+
+
+
     text = text.replace("'", "")
     text = "```log\n" + text + "\n```"
     print(text)
