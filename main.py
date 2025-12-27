@@ -91,7 +91,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "day" in text \
         :
         return None
-    elif "ss" in text:
+    elif "ss" in text and "ass" not in text:
         await make_ss(chat_id, context, text=text)
         return None
     elif "don" in text:
