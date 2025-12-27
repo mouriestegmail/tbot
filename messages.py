@@ -257,7 +257,7 @@ def make_sum(chat_id) -> None:
     text = "ПРОДАНО:\n{"
     print("make_sum")
     ss = 0
-    all_a = eval("{'agt':0, 'med':0, 'kil':0, 'pob':0,'ser':0}")
+    all_a = eval("{'ass':0, 'gvn':0, 'hlp':0, 'rad':0,'sno':0 , 'svt':0}")
     ttt = ""
     for name in workers:
         try:
@@ -864,6 +864,7 @@ def make_log(chat_id, text, count, attempt=5):
     if "logc" in text:
         filename = "C:/Celestial/Beta 1.16.5/logs/latest.log"
     print(filename)
+
 
     grep = None
     l_text = text.split(" ")
