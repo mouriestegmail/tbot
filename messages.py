@@ -257,7 +257,7 @@ def make_sum(chat_id) -> None:
     text = "ПРОДАНО:\n{"
     print("make_sum")
     ss = 0
-    all_a = eval("{'ass':0, 'gvn':0, 'hlp':0, 'rad':0,'sno':0 , 'svt':0}")
+    all_a = eval("{'ass':0, 'gnv':0, 'hlp':0, 'rad':0,'sno':0 , 'svt':0}")
     ttt = ""
     for name in workers:
         try:
