@@ -53,6 +53,7 @@ def format_text(text):
     text = text.replace('rad', 'r')
     text = text.replace('sno', 's')
     text = text.replace('svt', 'w')
+    text = text.replace('pal', 'p')
 
 
 
@@ -268,7 +269,7 @@ def make_sum(chat_id) -> None:
     text = "ПРОДАНО:\n{"
     print("make_sum")
     ss = 0
-    all_a = eval("{'ass':0, 'gnv':0, 'hlp':0, 'rad':0,'sno':0 , 'svt':0}")
+    all_a = eval("{'ass':0, 'gnv':0, 'hlp':0, 'rad':0,'sno':0 , 'svt':0, 'pal':0}")
     ttt = ""
     for name in workers:
         try:
