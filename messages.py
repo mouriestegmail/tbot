@@ -47,12 +47,12 @@ def format_text(text):
     text = text.replace('kil', 'k')
 
     #eval("{'ass':0, 'gnv':0, 'hlp':0, 'rad':0,'sno':0 , 'svt':0}")
-    text = text.replace('ass', 'as')
-    text = text.replace('gnv', 'gn')
-    text = text.replace('hlp', 'hl')
-    text = text.replace('rad', 'rd')
-    text = text.replace('sno', 'sn')
-    text = text.replace('svt', 'sv')
+    text = text.replace('ass', 'a')
+    text = text.replace('gnv', 'g')
+    text = text.replace('hlp', 'h')
+    text = text.replace('rad', 'r')
+    text = text.replace('sno', 's')
+    text = text.replace('svt', 'w')
 
 
 
