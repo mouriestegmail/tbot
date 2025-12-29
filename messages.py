@@ -508,12 +508,15 @@ async def make_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE, kconf=False) -
 
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
-async def set_bconf(chat_id,context: ContextTypes.DEFAULT_TYPE, text="") -> None:
+async def set_bconf(chat_id,context: ContextTypes.DEFAULT_TYPE, text="", kconf=False) -> None:
 
     if config.mode == config.mode_buyer:
         fn = "../mnbot/configs/buyer.json"
     else:
-        fn = "C:/share/worker.json"
+        if kconf:
+            fn = "C:/share/knyaz.json"
+        else:
+            fn = "C:/share/worker.json"
     from pathlib import Path
     path = Path(fn)
 
