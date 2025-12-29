@@ -185,9 +185,7 @@ def create_inventory_log() -> str:
 
     out = "\n".join(res)
 
-    print(out)
-
-    out = out.replace(", hlp: 0", "")
+    out = out.replace(", 'hlp': 0", "")
     out = out.replace(", ",",")
     out = out.replace(": ", ":")
 
