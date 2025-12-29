@@ -151,19 +151,40 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
         await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
 def create_inventory_log() -> str:
-    l_dir = config.log_dir
+    import os
 
-    fn = l_dir + f'/inventory.ah'
-    try:
-        with open(fn, 'r') as file:
-            first_line = file.readline().strip()
-            apples = eval(first_line)
-            apples = dict(sorted(apples.items()))
-            s = sum(apples.values())
-            return f"\ninventory:\n{str(apples)} {s}"
-    except Exception as e:
-        print(f"except: {e}")
-    return "\nNo data"
+    res = ["ИНВЕНТАРЬ:"]
+    ans = [502, 503, 504, 505]
+    dirr = "C:/share/inv_counter"
+
+    for an in ans:
+        fn = os.path.join(dirr, f"an{an}.inv")
+        if not os.path.isfile(fn):
+            continue
+
+        try:
+            with open(fn, "r", encoding="utf-8") as file:
+                first_line = file.readline().strip()
+                res.append(f"an{an}: {first_line}")
+        except Exception:
+            res.append(f"an{an}: error")
+
+    return "\n".join(res)
+
+
+    # l_dir = config.log_dir
+    #
+    # fn = l_dir + f'/inventory.ah'
+    # try:
+    #     with open(fn, 'r') as file:
+    #         first_line = file.readline().strip()
+    #         apples = eval(first_line)
+    #         apples = dict(sorted(apples.items()))
+    #         s = sum(apples.values())
+    #         return f"\ninventory:\n{str(apples)} {s}"
+    # except Exception as e:
+    #     print(f"except: {e}")
+    # return "\nNo data"
 
 import re
 from datetime import datetime
