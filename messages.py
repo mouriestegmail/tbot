@@ -170,7 +170,7 @@ def create_inventory_log() -> str:
                 line = file.readline().strip()
                 data = ast.literal_eval(line)  # {'an': 502, 'agt': 3, ...}
 
-                res.append(f"an{an}: {data}")
+                res.append(f"an{an}: {line}")
 
                 for k, v in data.items():
                     if k == "an":
@@ -183,10 +183,7 @@ def create_inventory_log() -> str:
     if total:
         res.append(f"  all: {str(total)}")
 
-    to_out = "\n".join(res)
-    to_out = to_out.replace(": ", "")
-
-    return to_out
+    return "\n".join(res)
 
 
 
