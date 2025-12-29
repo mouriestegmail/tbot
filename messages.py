@@ -183,7 +183,10 @@ def create_inventory_log() -> str:
     if total:
         res.append(f"  all: {str(total)}")
 
-    return "\n".join(res)
+    to_out = "\n".join(res)
+    to_out = to_out.replace(": ", "")
+
+    return to_out
 
 
 
