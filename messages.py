@@ -152,10 +152,13 @@ async def make_history(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 def create_inventory_log() -> str:
     import os
+    import ast
 
     res = ["ИНВЕНТАРЬ:"]
     ans = [502, 503, 504, 505]
     dirr = "C:/share/inv_counter"
+
+    total: dict = {}
 
     for an in ans:
         fn = os.path.join(dirr, f"an{an}.inv")
@@ -164,12 +167,24 @@ def create_inventory_log() -> str:
 
         try:
             with open(fn, "r", encoding="utf-8") as file:
-                first_line = file.readline().strip()
-                res.append(f"an{an}: {first_line}")
+                line = file.readline().strip()
+                data = ast.literal_eval(line)  # {'an': 502, 'agt': 3, ...}
+
+                res.append(f"an{an}: {data}")
+
+                for k, v in data.items():
+                    if k == "an":
+                        continue
+                    total[k] = total.get(k, 0) + v
+
         except Exception:
             res.append(f"an{an}: error")
 
+    if total:
+        res.append(f"  all: {str(total)}")
+
     return "\n".join(res)
+
 
 
     # l_dir = config.log_dir
