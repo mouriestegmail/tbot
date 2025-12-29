@@ -562,7 +562,7 @@ async def set_bconf(chat_id,context: ContextTypes.DEFAULT_TYPE, text="", kconf=F
         await context.bot.send_message(chat_id=chat_id, text=f"Ошибка записи в файл: {e}")
         return
 
-    await make_bconf(chat_id, context)
+    await make_bconf(chat_id, context, kconf=kconf)
 
 
 async def make_conf_buyer(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
