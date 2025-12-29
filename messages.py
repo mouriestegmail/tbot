@@ -185,7 +185,7 @@ def create_inventory_log() -> str:
 
     out = "\n".join(res)
 
-    out = out.replace(", 'hlp': 0", "")
+
     out = out.replace(", ",",")
     out = out.replace(": ", ":")
 
@@ -482,7 +482,7 @@ async def make_conf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = "```conf\n" + text + "\n```"
     await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown')
 
-async def make_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def make_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE, kconf=False) -> None:
     # Загрузка buyer.json
     from pathlib import Path
     path = Path("../mnbot/configs/buyer.json")
@@ -490,7 +490,10 @@ async def make_bconf(chat_id, context: ContextTypes.DEFAULT_TYPE) -> None:
     if config.mode == config.mode_buyer:
         path = Path("../mnbot/configs/buyer.json")
     else:
-        path = Path("C:/share/worker.json")
+        if kconf:
+            path = Path("C:/share/knyaz.json")
+        else:
+            path = Path("C:/share/worker.json")
 
     print(path)
 

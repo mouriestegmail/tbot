@@ -132,6 +132,8 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif "bconf" in text:
         await make_bconf(chat_id, context)
         return None
+    elif "kconf" in text:
+        await make_bconf(chat_id, context, kconf=True)
 
 
     elif "setconf" in text:
