@@ -26,7 +26,7 @@ short_to_full = {
     "ser": "Серная кислота",
 }
 
-workers = [w + str(n) for n in range(6) for w in "ABCDE"]
+workers = [w + str(n) for n in range(8) for w in "ABCDE"]
 # ans["an504", "an505", "an507"]
 print("workers: ", workers)
 

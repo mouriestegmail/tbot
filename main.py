@@ -1,3 +1,5 @@
+import traceback
+
 import messages
 from messages import *
 from telegram.ext import ContextTypes, MessageHandler, filters
@@ -280,6 +282,8 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
+        tb = traceback.format_exc()
+        print(f"tb: {tb}")
         print("Завершение родителя.", e)
         try:
             pass
