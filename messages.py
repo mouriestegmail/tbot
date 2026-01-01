@@ -155,7 +155,7 @@ def create_inventory_log() -> str:
     import ast
 
     res = ["ИНВЕНТАРЬ:"]
-    ans = [502, 503, 504, 505]
+    ans = [502, 503, 504, 505,506]
     dirr = "C:/share/inv_counter"
 
     total: dict = {}
