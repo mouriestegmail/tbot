@@ -168,6 +168,17 @@ class NewFileHandler(FileSystemEventHandler):
             await self.handler_time()
             if filepath.is_file():
                 filepath.unlink()
+        elif self.is_txt_filt(filepath):
+            print("txt")
+            sleep(2)
+
+            text = filepath.read_text(encoding="utf-8")
+
+            for id_chat in [config.andrei]:
+                with open(filepath, 'rb') as photo:
+                    await self.bot.send_message(chat_id=id_chat, text=text)
+
+
         elif self.is_img_file(filepath):
             print("png")
             sleep(2)
@@ -213,6 +224,9 @@ class NewFileHandler(FileSystemEventHandler):
 
     def is_img_file(self, file: Path) -> bool:
         return file.suffix.lower() in (".png", ".jpg", ".jpeg")
+
+    def is_txt_filt(self, file: Path) -> bool:
+        return file.suffix.lower() in (".txt", ".text")
 
     def is_time_file(self, file):
         return "time" in file
