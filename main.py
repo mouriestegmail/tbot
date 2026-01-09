@@ -165,7 +165,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         tmp = fn + "tmp"
         reply = fn + "input"
         with open(tmp, 'w', encoding="utf-8") as f:
-            f.write("log7" + text)
+            f.write(f"log7 {text}")
         os.replace(tmp, reply)
         return None
 
