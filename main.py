@@ -161,6 +161,14 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await make_history(chat_id, context)
         return None
     else:
+        fn = config.watch_dir + f"/{chat_id}."
+        tmp = fn + "tmp"
+        reply = fn + "input"
+        with open(tmp, 'w', encoding="utf-8") as f:
+            f.write("log7" + text)
+        os.replace(tmp, reply)
+        return None
+
         if chat_id not in config.users:
             return None
         text = """ss    - shot from workers [ss w1]
